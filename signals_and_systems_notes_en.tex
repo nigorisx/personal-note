@@ -1,0 +1,1767 @@
+% !TEX root = ./signals_and_systems_notes_en.tex
+% !TEX program = xelatex
+% English edition of 信号与系统笔记.tex — all display math kept unchanged.
+% Layout (fonts / cover / boxes / TOC style) lives in _preamble_en.tex
+\input{_preamble_en}
+\usepackage{subcaption}                   % side-by-side subfigures
+
+\begin{document}
+\maketitle
+\frontmatter
+\tableofcontents
+\mainmatter
+\clearpage
+
+% ==================================================================
+\chapter{Introduction}
+% ==================================================================
+
+% \section{Signals and Systems}
+
+% \begin{definition*}
+% A signal is a representation of information; information is the content
+% carried by a signal.
+
+% A system is an aggregate of interacting, interdependent things that
+% together perform a specific function.
+% \end{definition*}
+
+% \section{Description, Classification, and Examples of Signals}
+
+% \begin{figure}[htbp]
+% \centering
+% \resizebox{\linewidth}{!}{%
+% \begin{forest}
+%     for tree={
+%         grow'=0,
+%         parent anchor=east,
+%         child anchor=west,
+%         edge path={
+%             \noexpand\path[\forestoption{edge}] (!u.parent anchor) -- +(5pt,0) |- (.child anchor)\forestoption{edge label};
+%         },
+%         l sep=12pt,
+%         s sep=6pt,
+%         font=\small,
+%         align=center,
+%         draw,
+%         rounded corners,
+%     }
+%     [Classification of signals,
+%         [deterministic?,
+%             [deterministic signals]
+%             [random signals]
+%         ]
+%         [regularity,
+%             [{periodic signals\\$f(t)=f(t+nT)$}]
+%             [aperiodic signals]
+%         ]
+%         [discrete vs.\ continuous,
+%             [continuous-time signals]
+%             [discrete-time signals,
+%                 [sampled signals\\(continuous amplitude)]
+%                 [{digital signals\\(amplitude 0 or 1)}]
+%             ]
+%         ]
+%         [dimension,
+%             [one-dimensional signals]
+%             [multi-dimensional signals]
+%         ]
+%     ]
+% \end{forest}}
+% \caption{Classification of signals}
+% \end{figure}
+
+% Signals can be classified from many viewpoints, and the classes are not
+% mutually exclusive: one and the same signal may be deterministic, periodic,
+% continuous-time, and one-dimensional all at once.
+
+% \section{Typical Signals}
+
+% \begin{enumerate}
+%     \item Exponential signals
+%     \[
+%         f(t)=ke^{at}
+%     \]
+%     with the time constant $\tau$ defined as
+%     \[
+%         \tau=\frac{1}{|a|}.
+%     \]
+
+%     \begin{figure}[htbp]
+%     \centering
+%     \begin{tikzpicture}
+%         \begin{axis}[
+%             width=10cm, height=6cm,
+%             xmin=0, xmax=3.5,
+%             ymin=0, ymax=8,
+%             xlabel={$t$}, ylabel={$f(t)$},
+%             axis lines=center,
+%             grid=major,
+%             grid style={dashed, gray!50},
+%             xtick={0,1,2,3},
+%             ytick={0,2,4,6,8},
+%             samples=100,
+%             legend pos=north west,
+%             domain=0:3,
+%         ]
+%             \addplot[blue, thick] {2^x};
+%             \addlegendentry{$a>1$ (increasing)}
+
+%             \addplot[red, thick, dashed] {0.5^x};
+%             \addlegendentry{$0<a<1$ (decreasing)}
+%         \end{axis}
+%     \end{tikzpicture}
+%     \caption{Exponential signals}
+%     \end{figure}
+
+%     \textcolor{red}{\textbf{The integral and the derivative of an exponential
+%     signal are still exponential signals.}}
+
+%     \item Sinusoidal signals
+%     \[
+%         f(t)=A\sin(\omega t+\theta)
+%     \]
+%     This is an ideal, undamped sinusoid; with damping one multiplies by an
+%     exponentially decaying factor, i.e.\ the damped sinusoid
+%     $Ke^{-\alpha t}\sin(\omega t+\theta)$.
+
+%     \item Complex exponential signals
+%     \[
+%         f(t)=Ke^{st},\qquad s=\sigma+j\omega
+%     \]
+%     Using Euler's formula,
+%     \[
+%         f(t)=Ke^{(\sigma+j\omega)t}=Ke^{\sigma t}e^{j\omega t}
+%         =Ke^{\sigma t}\bigl[\cos(\omega t)+j\sin(\omega t)\bigr].
+%     \]
+%     Thus $\sigma$ controls the decay or growth of the envelope and $\omega$
+%     the rate of oscillation; taking the real part yields the damped sinusoid,
+%     so the complex exponential is the basic building block for describing
+%     LTI systems.
+
+%     \item The sampling function
+%     \[
+%         \Sa(t)=\frac{\sin t}{t}
+%     \]
+%     Main properties:
+%     \begin{itemize}
+%         \item $\Sa(t)$ is even, with maximum value $1$ at $t=0$;
+%         \item $\Sa(k\pi)=0\ (k=\pm1,\pm2,\dots)$;
+%         \item $\displaystyle\int_{0}^{\infty}\Sa(t)\,\dd t=\frac{\pi}{2}$,
+%               $\displaystyle\int_{-\infty}^{\infty}\Sa(t)\,\dd t=\pi$.
+%     \end{itemize}
+
+%     \begin{proof}
+%     Let
+%     \[
+%         I(a)=\int_{0}^{\infty}e^{-at}\frac{\sin t}{t}\,\dd t \qquad (a>0).
+%     \]
+%     Differentiating with respect to the parameter $a$ and interchanging
+%     differentiation and integration:
+%     \[
+%         I'(a)=-\int_{0}^{\infty}e^{-at}\sin t\,\dd t=-\frac{1}{1+a^{2}}.
+%     \]
+%     Since $I(\infty)=0$, integrating both sides gives
+%     \[
+%         I(a)=\int_{a}^{\infty}\frac{\dd u}{1+u^{2}}=\frac{\pi}{2}-\arctan a .
+%     \]
+%     Letting $a\to 0^{+}$,
+%     \[
+%         \int_{0}^{\infty}\Sa(t)\,\dd t=\lim_{a\to0^{+}}I(a)=\frac{\pi}{2}.
+%     \]
+%     Since $\Sa(t)$ is even,
+%     $\displaystyle\int_{-\infty}^{\infty}\Sa(t)\,\dd t=\pi$.
+%     \end{proof}
+% \end{enumerate}
+
+% ==================================================================
+\chapter{Time-Domain Analysis of Continuous-Time Systems}
+% ==================================================================
+
+\section{The Classical Solution of Differential Equations}
+
+The mathematical model relating the input and the response of an LTI
+continuous-time system is an $n$-th order linear differential equation with
+constant coefficients,
+\[
+    \sum_{j=0}^{n}a_j\,y^{(j)}(t)=\sum_{i=0}^{m}b_i\,f^{(i)}(t).
+\]
+The complete solution of the differential equation consists of a homogeneous
+solution and a particular solution,
+\[
+    y(t)=y_h(t)+y_p(t).
+\]
+The homogeneous solution solves the homogeneous equation; its form is
+determined by the characteristic roots:
+
+\begin{table}[htbp]
+\centering
+\caption{Forms of the homogeneous solution $y_h(t)$}
+\small
+\begin{tabular}{@{}p{0.31\linewidth}p{0.61\linewidth}@{}}
+\toprule
+Characteristic root $\lambda$ & Homogeneous solution $y_h(t)$ \\
+\midrule
+simple real root & $e^{\lambda t}$ \\
+real root of multiplicity $r$ & $(C_{r-1}t^{r-1}+C_{r-2}t^{r-2}+\cdots+C_1t+C_0)\,e^{\lambda t}$ \\
+a pair of complex conjugate roots $\lambda_{1,2}=\alpha\pm j\beta$ &
+$e^{\alpha t}\bigl(C\cos\beta t+D\sin\beta t\bigr)$ \\
+complex conjugate roots of multiplicity $r$ &
+$e^{\alpha t}\bigl[A_{r-1}t^{r-1}\cos(\beta t+\theta_{r-1})+\cdots+A_0\cos(\beta t+\theta_0)\bigr]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The functional form of the particular solution depends on the form of the
+input:
+
+\begin{table}[htbp]
+\centering
+\caption{Forms of the particular solution $y_p(t)$}
+\small
+\begin{tabular}{@{}p{0.26\linewidth}p{0.40\linewidth}p{0.26\linewidth}@{}}
+\toprule
+Input $f(t)$ & Particular solution $y_p(t)$ & Condition \\
+\midrule
+$t^{m}$ & $t^{r}\bigl(P_mt^{m}+P_{m-1}t^{m-1}+\cdots+P_0\bigr)$ &
+characteristic root $0$ of multiplicity $r$ \\
+$e^{\alpha t}$ & $\bigl(P_rt^{r}+P_{r-1}t^{r-1}+\cdots+P_1t+P_0\bigr)e^{\alpha t}$ &
+$\alpha$ is a characteristic root of multiplicity $r$ \\
+$\cos\beta t$ or $\sin\beta t$ & $P\cos\beta t+Q\sin\beta t$ &
+no characteristic root equals $j\beta$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{note}
+``Multiplicity $r$'' in the table is the generic notation: when the input does
+not coincide with a characteristic root, take $r=0$; the particular solution
+then carries no factor of $t$ and is the ordinary undetermined-coefficient
+form.
+\end{note}
+
+\section{On the Values at $0_{-}$ and $0_{+}$}
+
+When solving a differential equation by the classical method, the input
+$f(t)$ is usually applied to the system at $t=0$, and the solution holds for
+$t>0$. The set of initial values needed to fix the solution refers to the
+instant $t=0_{+}$. At $t=0_{-}$ the input has not yet been applied, so the
+values of the system depend only on the initial state, not on the input. For
+some inputs, the response and its derivatives jump when the input is switched
+on, so the jump values must be found.
+
+\subsection{The Integration Method}
+
+This method is based on the integral properties of $\delta(t)$,
+$\varepsilon(t)$, and $t\varepsilon(t)$, and on their behaviour at the origin:
+$\delta(t)$ has an impulse at the origin; its integral $\varepsilon(t)$ jumps
+at the origin; and the integral of $\varepsilon(t)$, namely $t\varepsilon(t)$,
+is continuous there.
+
+\begin{note}
+\textbf{Example}\quad An LTI system is described by
+\[
+    y''(t)+3y'(t)+2y(t)=2f'(t)+6f(t),
+\]
+with $y(0_{-})=2$, $y'(0_{-})=0$, and $f(t)=\varepsilon(t)$. Find
+$y(0_{+})$ and $y'(0_{+})$.
+
+\textbf{Solution}\quad Only the initial values are computed here.
+Substituting the input, $f'(t)=\delta(t)$, gives
+\[
+    y''(t)+3y'(t)+2y(t)=2\delta(t)+6\varepsilon(t).
+\]
+Integrating both sides from $0_{-}$ to $0_{+}$:
+\[
+    \int_{0_{-}}^{0_{+}}y''(t)\,\dd t
+    +3\int_{0_{-}}^{0_{+}}y'(t)\,\dd t
+    +2\int_{0_{-}}^{0_{+}}y(t)\,\dd t
+    =2\int_{0_{-}}^{0_{+}}\delta(t)\,\dd t
+    +6\int_{0_{-}}^{0_{+}}\varepsilon(t)\,\dd t .
+\]
+Inspecting the structure of the equation, $y''(t)$ is the only term that can
+contain $\delta(t)$, while $y'(t)$ is bounded near the origin and $y(t)$ is
+continuous; hence the last two integrals on the left vanish, and so does the
+second term on the right:
+\[
+    \bigl[y'(0_{+})-y'(0_{-})\bigr]+3\cdot 0+2\cdot 0=2+0 .
+\]
+Therefore
+\[
+    y'(0_{+})=2,\qquad y(0_{+})=y(0_{-})=2 .
+\]
+\end{note}
+
+\subsection{The Undetermined-Coefficient Method}
+
+When the input contains higher-order derivatives of the impulse function, the
+integration method cannot reduce them to continuous functions and thus yields
+no unique solution, only a system of equations. In that case use the method of
+undetermined coefficients.
+
+\begin{note}
+\textbf{Example}\quad Let
+\[
+    y''(t)+2y'(t)+y(t)=\delta''(t)+2\delta(t).
+\]
+For the equality to hold, the coefficients of each term on both sides must
+match. Since $y''(t)$ must contain a $\delta''(t)$ term, set
+\[
+    y''(t)=a\,\delta''(t)+b\,\delta'(t)+c\,\delta(t)+r_0(t),
+\]
+and integrate term by term:
+\[
+    y'(t)=a\,\delta'(t)+b\,\delta(t)+r_1(t),
+    \qquad
+    y(t)=a\,\delta(t)+r_2(t).
+\]
+Substituting back into the original equation and matching coefficients:
+\[
+    \begin{cases}
+        a=1,\\
+        b+2a=0,\\
+        c+2b+a=2,
+    \end{cases}
+    \quad\Longrightarrow\quad
+    a=1,\ b=-2,\ c=3 .
+\]
+Integrating the impulsive parts of $y'(t)$ and $y''(t)$ then gives the initial
+values.
+\end{note}
+
+\begin{warning}
+Here $r(t)$ denotes the part whose integral over a neighbourhood of the origin
+vanishes; it does not affect the computation of the initial values, so only
+the coefficients of the singular terms need to be matched.
+\end{warning}
+
+\section{Zero-Input Response}
+
+The response caused by the initial state $\{x(0)\}$ alone is called the
+zero-input response, denoted $y_{zi}(t)$. With zero input, the right-hand side
+of the differential equation vanishes and it becomes homogeneous:
+\[
+    \sum_{j=0}^{n}a_j\,y_{zi}^{(j)}(t)=0 .
+\]
+If all characteristic roots are simple, then
+\[
+    y_{zi}(t)=\sum_{j=1}^{n}C_{zij}\,e^{\lambda_j t}.
+\]
+Because the input is zero, the initial values are just the system's initial
+values, and no jump occurs.
+
+\section{Zero-State Response}
+
+Zero state means the initial values of the system are zero; the response is
+caused by the input $f(t)$ alone and is denoted $y_{zs}(t)$:
+\[
+    \sum_{j=0}^{n}a_j\,y_{zs}^{(j)}(t)=\sum_{i=0}^{m}b_i\,f^{(i)}(t).
+\]
+If the characteristic roots of the differential equation are all simple, the
+zero-state response is
+\[
+    y_{zs}(t)=\sum_{j=1}^{n}C_{zsj}\,e^{\lambda_j t}+y_p(t),
+\]
+where $y_p(t)$ is a particular solution of the equation.
+
+\section{The Complete Response}
+
+\begin{equation}
+    y(t)=y_{zi}(t)+y_{zs}(t),
+\end{equation}
+and each derivative obeys the same linear relation
+\[
+    y^{(n)}(t)=y_{zi}^{(n)}(t)+y_{zs}^{(n)}(t).
+\]
+In summary, the complete response of an LTI system can be decomposed either
+into the zero-input and zero-state responses, or into the natural and forced
+responses:
+\[
+    y(t)=\sum_{j=1}^{n}C_j e^{\lambda_j t}+y_p(t)
+        =\sum_{j=1}^{n}C_{zij}e^{\lambda_j t}+\sum_{j=1}^{n}C_{zsj}e^{\lambda_j t}+y_p(t).
+\]
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{forest}
+    for tree={
+        grow'=0,
+        parent anchor=east,
+        child anchor=west,
+        edge path={
+            \noexpand\path[\forestoption{edge}] (!u.parent anchor) -- +(5pt,0) |- (.child anchor)\forestoption{edge label};
+        },
+        l sep=10pt,
+        s sep=4pt,
+        inner sep=1.5pt,
+        font=\small,
+        align=center,
+        draw,
+        rounded corners,
+    }
+    [Complete response $y(t)$
+        [Zero-input response $y_{zi}(t)$
+            [determined by the\\initial state alone]
+            [{input is zero, no jump}]
+        ]
+        [Zero-state response $y_{zs}(t)$
+            [determined by\\the input alone]
+            [zero initial state]
+        ]
+        [Natural response
+            [homogeneous-solution form]
+            [coefficients fixed by initial state\\and input together]
+        ]
+        [Forced response
+            [particular-solution form]
+            [determined by the input]
+        ]
+    ]
+\end{forest}}
+\caption{Two decompositions of the complete response}
+\end{figure}
+
+\section{Impulse Response and Step Response}
+
+\subsection{Impulse Response}
+
+Define
+\[
+    h(t)=T\bigl[\{0\},\delta(t)\bigr].
+\]
+
+\textbf{How to find the impulse response}
+
+Two cases arise for LTI systems: the right-hand side of the differential
+equation contains only $f(t)$, or it contains $f(t)$ together with its
+derivatives. Using the linearity and the differentiation property of the
+zero-state response of an LTI system, the second case reduces to the first:
+\[
+    \sum_{j=0}^{n}a_j\,y^{(j)}(t)=\sum_{j=0}^{m}b_j\,f^{(j)}(t).
+\]
+Choose a new variable $y_1(t)$ whose differential equation has the same
+left-hand side but only $f(t)$ on the right:
+\[
+    \sum_{j=0}^{n}a_j\,y_1^{(j)}(t)=f(t).
+\]
+Let its impulse response be $h_1(t)$. By linearity and the differentiation
+property,
+\[
+    h(t)=b_m h_1^{(m)}(t)+b_{m-1}h_1^{(m-1)}(t)+\cdots+b_0 h_1(t).
+\]
+
+\subsection{Step Response}
+
+Define
+\[
+    g(t)=T\bigl[\{0\},\varepsilon(t)\bigr].
+\]
+If the right-hand side of the equation contains only $f(t)$, then
+\[
+    \begin{cases}
+        g^{(n)}(t)+a_{n-1}g^{(n-1)}(t)+\cdots+a_0g(t)=\varepsilon(t),\\[4pt]
+        g^{(j)}(0_{-})=0,\quad j=0,1,2,\dots,n-1 .
+    \end{cases}
+\]
+If the characteristic roots are all simple, then
+\[
+    g(t)=\Bigl(\sum_{j=1}^{n}C_j e^{\lambda_j t}+\frac{1}{a_0}\Bigr)\varepsilon(t).
+\]
+Since $\varepsilon(t)$ is the integral of $\delta(t)$, $g(t)$ is the integral
+of $h(t)$: $g(t)=\displaystyle\int_{-\infty}^{t}h(\tau)\,\dd\tau$; finding one
+of them gives the other.
+
+\section{Zero-State Response and the Convolution Integral}
+
+The zero-state response of an LTI system equals the convolution of the input
+with the impulse response. Decompose the input into a superposition of
+impulses,
+\[
+    f(t)=\int_{-\infty}^{\infty}f(\tau)\,\delta(t-\tau)\,\dd\tau ,
+\]
+By linearity and time invariance, each impulse $\delta(t-\tau)$ produces the
+response $h(t-\tau)$, hence
+\begin{equation}
+    y_{zs}(t)=\int_{-\infty}^{\infty}f(\tau)\,h(t-\tau)\,\dd\tau
+            =\int_{-\infty}^{\infty}h(\tau)\,f(t-\tau)\,\dd\tau
+            \overset{\mathrm{def}}{=}f(t)*h(t).
+\end{equation}
+This is the \textbf{convolution integral}. It obeys the commutative,
+distributive, and associative laws, together with convolution by an impulse,
+$f(t)*\delta(t-t_0)=f(t-t_0)$; for a causal system $h(t)$ vanishes for $t<0$,
+so the lower limit of the integral may be changed to $0$. With a causal input,
+\[
+    y_{zs}(t)=f(t)*h(t)=\int_{0}^{t}f(\tau)h(t-\tau)\,\dd\tau .
+\]
+
+\section{Zero-State Response and the Convolution Integral}
+We defined a narrow pulse $p_n(t)$ of unit strength (i.e.\ unit area under the
+pulse waveform).
+\\
+An arbitrary input $f(t)$ can be split into many narrow pulses of width
+$\Delta \tau$.
+\\
+The $k$-th pulse occurs at time $t=k\Delta\tau$ with height $f(k\Delta\tau)$,
+and can be written as $f(k\Delta \tau)\Delta \tau\, p_n(t-k\Delta \tau)$:
+\begin{equation}
+    f_{\Delta}(t)=\sum_{k=-\infty}^{\infty}f(k\Delta \tau)\Delta \tau p_n(t-k\Delta \tau)
+\end{equation}
+whose limit as $\Delta \tau \rightarrow 0$ is $f(t)$:
+\begin{equation}
+    f(t)=\lim_{\tau \rightarrow 0}f_{\Delta}(t)=\int_{-\infty}^{\infty}f(\tau)\delta(t-\tau)d\tau
+\end{equation}
+Through this process, $f(t)$ is microscopically split into a sum of
+infinitely many impulse functions. By the linearity and time invariance of
+LTI systems, the zero-state response to an arbitrary input is
+\begin{equation}
+    y_{zs}(t)=\int_{-\infty}^{\infty}f(\tau)h(t-\tau)d\tau
+\end{equation}
+This operation is defined as the convolution integral. The equation above
+states that the zero-state response $y_{zs}(t)$ of an LTI system is the
+convolution of $f(t)$ with the impulse response $h(t)$, written as
+\begin{equation}
+    y_{zs}(t)=f(t)* h(t)
+\end{equation}
+Microscopically, the input $f(t)$ is decomposed into a sum of infinitely many
+impulses, each with strength equal to the value of $f(t)$ at its position; by
+linearity, the response is the sum of the responses to all the impulses acting
+separately.
+By time invariance, each such response is time-shifted as well. By linearity,
+the response of the system at $t=t_0$ equals the sum of the responses produced
+by all input components acting separately.
+
+\subsection{Properties of the Convolution Integral}
+\begin{equation}
+    f(t)=f_1(t)*f_2(t)=\int_{-\infty}^{\infty}f_1(\tau)f_2(t-\tau)d\tau
+\end{equation}
+\textbf{Property 1 (commutativity)}\\
+\begin{equation}
+    f_1(t)*f_2(t)=f_2(t)*f_1(t)
+\end{equation}
+\begin{note}
+\textbf{Proof}
+\begin{equation*}
+    \int_{-\infty}^{\infty}f_1(\tau)f_2(t-\tau)d\tau = \int_{-\infty}^{\infty}f_2(\tau)f_1(t-\tau)d\tau
+\end{equation*}
+\end{note}
+\textbf{Property 2 (distributivity)}\\
+\begin{equation}
+    f_1(t)*[f_2(t)+f_3(t)]=f_1(t)*f_2(t)+f_1(t)*f_3(t)
+\end{equation}
+\begin{note}
+\textbf{Proof}
+\begin{equation*}
+    \int_{-\infty}^{\infty}f_1(\tau)[f_2(t-\tau)+f_3(t-\tau)]d\tau = \int_{-\infty}^{\infty}f_1(\tau)f_2(t-\tau)d\tau + \int_{-\infty}^{\infty}f_1(\tau)f_3(t-\tau)d\tau
+\end{equation*}
+\end{note}
+\textbf{Property 3 (associativity)}\\
+\begin{equation}
+    f_1(t)*[f_2(t)*f_3(t)]=[f_1(t)*f_2(t)]*f_3(t)
+\end{equation}
+\begin{note}
+\textbf{Proof}
+\begin{equation*}
+    \int_{-\infty}^{\infty}f_1(\tau)[\int_{-\infty}^{\infty}f_2(\sigma)f_3(t-\tau-\sigma)d\sigma]d\tau = \int_{-\infty}^{\infty}[\int_{-\infty}^{\infty}f_1(\tau)f_2(\sigma)d\tau]f_3(t-\sigma)d\sigma
+\end{equation*}
+\end{note}
+
+% ==================================================================
+\subsection{Convolution with the Impulse Function}
+% ==================================================================
+Using commutativity, the convolution of a function with the impulse function is
+\[
+f(t)*\delta(t)=\delta(t)*f(t)=\int_{-\infty}^{\infty}\delta(\tau)f(t-\tau)d\tau=f(t)
+\]
+that is,
+\[
+f(t)*\delta(t)=\delta(t)*f(t)=f(t)
+\]
+More generally,
+\[
+f(t)*\delta(t-t_0)=\delta(t-t_0)*f(t)=f(t-t_0)
+\]
+In addition,
+\[
+f(t-t_1)*\delta(t-t_2)=\delta(t-t_2)*f(t-t_1)=f(t-t_1-t_2)
+\]
+
+\subsection{Differentiation and Integration of Convolution}
+\begin{definition*}
+   \[ f^{(1)}(t)=\frac{df(t)}{dt}
+   \]
+\end{definition*}
+\begin{definition*}
+   \[ f^{(-1)}(t)=\int_{-\infty}^t f(\tau)d\tau
+   \]
+\end{definition*}
+If
+\[
+f(t)=f_1(t)*f_2(t)=f_2(t)*f_1(t)
+\]
+then
+\[
+    f^{(1)}(t)=f_1^{(1)}(t)*f_2(t)=f_1(t)*f_2^{(1)}(t)
+\]
+\[
+    f^{(-1)}(t)=f_1^{(-1)}(t)*f_2(t)=f_1(t)*f_2^{(-1)}(t)
+\]
+\textbf{Generalized result}
+\[
+    f^{(i)}(t)=f_1^{(j)}(t)*f_2^{(i-j)}(t)
+\]
+% ==================================================================
+\chapter{Time-Domain Analysis of Discrete-Time Systems}
+% ==================================================================
+
+\section{Differences and Difference Equations}
+
+Define the first-order forward difference as
+\[
+    \Delta f(k)=f(k+1)-f(k),
+\]
+and the first-order backward difference as
+\[
+    \nabla f(k)=f(k)-f(k-1).
+\]
+The two behave identically; we use the backward difference below. Verify
+linearity:
+\[
+\begin{aligned}
+\nabla\bigl[a_1f_1(k)+a_2f_2(k)\bigr]
+&= \bigl[a_1f_1(k)+a_2f_2(k)\bigr]-\bigl[a_1f_1(k-1)+a_2f_2(k-1)\bigr]\\
+&= a_1\bigl[f_1(k)-f_1(k-1)\bigr]+a_2\bigl[f_2(k)-f_2(k-1)\bigr]\\
+&= a_1\nabla f_1(k)+a_2\nabla f_2(k).
+\end{aligned}
+\]
+Hence the difference operator is linear.
+
+Define the $n$-th order difference
+\[
+    \nabla^{n}f(k)=\nabla\bigl[\nabla^{n-1}f(k)\bigr]
+    =\sum_{j=0}^{n}(-1)^{j}\dbinom{n}{j}f(k-j).
+\]
+A difference equation is an equation in the independent variable $k$ involving
+an unknown sequence $y(k)$ and its differences, generally written
+\[
+    F\bigl(k,y(k),\nabla y(k),\dots,\nabla^{n}y(k)\bigr)=0 .
+\]
+Since an $n$-th order difference is a linear combination of $y(k)$ and its
+shifted versions, it may equally be written
+\[
+    G\bigl(k,y(k),y(k-1),y(k-2),\dots,y(k-n)\bigr)=0 .
+\]
+Discrete LTI systems are described by linear difference equations with
+constant coefficients, which can be solved numerically by iteration.
+
+\section{The Classical Solution of Difference Equations}
+
+For a single-input, single-output discrete LTI system with input $f(k)$ and
+complete response $y(k)$, the model is an $n$-th order linear
+constant-coefficient difference equation:
+\[
+    \sum_{j=0}^{n}a_{n-j}\,y(k-j)=\sum_{i=0}^{m}b_{m-i}\,f(k-i).
+\]
+Its solution again combines a homogeneous and a particular part:
+\[
+    y(k)=y_h(k)+y_p(k).
+\]
+
+\subsection{The Homogeneous Solution}
+
+The solution of the homogeneous equation
+\[
+    y(k)+a_{n-1}y(k-1)+a_{n-2}y(k-2)+\cdots+a_0y(k-n)=0
+\]
+is called the homogeneous solution. Take a first-order difference equation as
+an example:
+\[
+    y(k)+ay(k-1)=0
+    \quad\Longrightarrow\quad
+    \frac{y(k)}{y(k-1)}=-a,
+\]
+which is a geometric sequence, so $y(k)$ must have the form
+\[
+    y(k)=C_0(-a)^{k}.
+\]
+For an $n$-th order equation the homogeneous solution is a combination of
+sequences $C\lambda^{k}$. Substituting into the homogeneous equation:
+\[
+    C\lambda^{k}+a_{n-1}C\lambda^{k-1}+a_{n-2}C\lambda^{k-2}+\cdots+a_0C\lambda^{k-n}=0 .
+\]
+Cancelling $C$ and $\lambda^{k-n}$:
+\[
+    \lambda^{n}+a_{n-1}\lambda^{n-1}+\cdots+a_1\lambda+a_0=0 .
+\]
+This is the \textbf{characteristic equation}; different roots give different
+forms of the homogeneous solution:
+
+\begin{table}[htbp]
+\centering
+\caption{Forms of the homogeneous solution $y_h(k)$}
+\small
+\begin{tabular}{@{}p{0.30\linewidth}p{0.62\linewidth}@{}}
+\toprule
+Characteristic root $\lambda$ & Homogeneous solution $y_h(k)$ \\
+\midrule
+simple real root & $C\lambda^{k}$ \\
+real root of multiplicity $r$ & $\Bigl(\sum_{i=0}^{r-1}C_i k^{i}\Bigr)\lambda^{k}$ \\
+a pair of complex conjugate roots $\lambda_{1,2}=a\pm bi=\rho e^{\pm j\theta}$ &
+$\rho^{k}\bigl(C\cos\beta k+D\sin\beta k\bigr)$ or $A\rho^{k}\cos(\beta k+\theta)$ \\
+complex conjugate roots of multiplicity $r$ &
+$\rho^{k}\Bigl(\sum_{i=0}^{r-1}A_i k^{r-1}\cos(\beta k+\theta_i)\Bigr)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Particular Solution}
+
+The functional form of the particular solution depends on the form of the
+input:
+
+\begin{table}[htbp]
+\centering
+\caption{Forms of the particular solution $y_p(k)$}
+\small
+\begin{tabular}{@{}p{0.28\linewidth}p{0.42\linewidth}p{0.24\linewidth}@{}}
+\toprule
+Input $f(k)$ & Particular solution $y_p(k)$ & Condition \\
+\midrule
+$k^{m}$ & $P_mk^{m}+P_{m-1}k^{m-1}+\cdots+P_1k+P_0$ & no characteristic root equals $1$ \\
+$k^{m}$ & $k^{r}\bigl(P_mk^{m}+P_{m-1}k^{m-1}+\cdots+P_1k+P_0\bigr)$ & characteristic root $1$ of multiplicity $r$ \\
+$a^{k}$ & $Pa^{k}$ & $a$ is not a characteristic root \\
+$a^{k}$ & $\bigl(P_rk^{r}+P_{r-1}k^{r-1}+\cdots+P_1k+P_0\bigr)a^{k}$ & $a$ is a characteristic root of multiplicity $r$ \\
+$\cos\beta k$ or $\sin\beta k$ & $P\cos\beta k+Q\sin\beta k$ & no characteristic root equals $e^{j\beta}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Zero-Input and Zero-State Responses}
+
+The response caused by the initial state alone (zero input) is the zero-input
+response:
+\[
+    \sum_{j=0}^{n}a_{n-j}\,y_{zi}(k-j)=0 .
+\]
+The response of a zero-initial-state system to the input alone is the
+zero-state response:
+\[
+    \begin{cases}
+        \displaystyle\sum_{j=0}^{n}a_{n-j}\,y_{zs}(k-j)=\sum_{i=0}^{m}b_{m-i}\,f(k-i),\\[8pt]
+        y_{zs}(-1)=y_{zs}(-2)=\cdots=y_{zs}(-n)=0 .
+    \end{cases}
+\]
+
+\begin{note}
+The complete response can be decomposed into the zero-input and zero-state
+responses, or into the natural and forced responses; the two decompositions
+differ slightly. Both the zero-input response and the natural response are
+homogeneous solutions, but with different coefficients: the coefficients of
+the natural response are fixed by the initial state \emph{and} the input
+together, whereas those of the zero-input response are fixed by the initial
+state alone.
+\end{note}
+
+\section{The Unit Sequence and the Unit Sequence Response}
+
+The unit sequence is defined as
+\[
+    \delta(k)=
+    \begin{cases}
+        1, & k=0,\\
+        0, & k\neq 0 .
+    \end{cases}
+\]
+The unit step sequence is defined as
+\[
+    \varepsilon(k)=
+    \begin{cases}
+        0, & k<0,\\
+        1, & k\ge 0 .
+    \end{cases}
+\]
+They are related by $\delta(k)=\varepsilon(k)-\varepsilon(k-1)$ and
+$\varepsilon(k)=\sum_{i=0}^{\infty}\delta(k-i)$.
+
+\subsection{The Unit Sequence Response}
+
+The unit sequence response is denoted $h(k)$. It can be found by solving the
+difference equation, or by the $z$-transform. When the right-hand side of the
+equation contains shifted copies of $f(k)$, the linearity and shift invariance
+of the zero-state response reduce the problem to the case where the
+right-hand side contains only $f(k)$.
+
+\section{Zero-State Response and the Convolution Sum}
+
+\subsection{Zero-State Response to an Arbitrary Input}
+
+For an LTI discrete system, decompose the input into unit sequences: if the
+unit sequence response is known, the response to each unit sequence follows
+immediately, and their sum is the zero-state response. This summation is
+called the \textbf{convolution sum}.
+\[
+    f(k)=\sum_{i=-\infty}^{\infty}f(i)\,\delta(k-i),
+\]
+hence
+\[
+    y_{zs}(k)=\sum_{i=-\infty}^{\infty}f(i)\,h(k-i)=f(k)*h(k).
+\]
+
+\subsection{The Convolution Sum}
+
+\begin{equation}
+    y(k)=f_1(k)*f_2(k)=\sum_{i=-\infty}^{\infty}f_1(i)\,f_2(k-i).
+\end{equation}
+For causal sequences (zero for $k<0$) the lower limit becomes $0$ and the
+upper limit $k$:
+\[
+    y(k)=\sum_{i=0}^{k}f_1(i)\,f_2(k-i).
+\]
+
+\subsection{Properties of the Convolution Sum}
+
+\begin{itemize}
+    \item \textbf{Commutativity}: $f_1(k)*f_2(k)=f_2(k)*f_1(k)$;
+    \item \textbf{Distributivity}: $f_1(k)*\bigl[f_2(k)+f_3(k)\bigr]=f_1(k)*f_2(k)+f_1(k)*f_3(k)$;
+    \item \textbf{Associativity}: $\bigl[f_1(k)*f_2(k)\bigr]*f_3(k)=f_1(k)*\bigl[f_2(k)*f_3(k)\bigr]$;
+    \item \textbf{Time shifting}: if $f_1(k)*f_2(k)=f(k)$, then
+          $f_1(k-k_1)*f_2(k-k_2)=f(k-k_1-k_2)$;
+    \item \textbf{Convolution with the unit sequence}: $f(k)*\delta(k)=f(k)$,
+          $f(k)*\delta(k-k_0)=f(k-k_0)$;
+    \item \textbf{Accumulation}: $\displaystyle\sum_{i=-\infty}^{k}f(i)=f(k)*\varepsilon(k)$.
+\end{itemize}
+
+% ==================================================================
+\chapter{The Fourier Transform and Frequency-Domain Analysis}
+% ==================================================================
+
+\section{Notational Conventions}
+
+\begin{table}[htbp]
+\centering
+\caption{Notation used in this chapter}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Symbol & Meaning \\
+\midrule
+$T$ & period of the signal \\
+$\Omega=\dfrac{2\pi}{T}$ & fundamental angular frequency (periodic signals) \\
+$n$ & harmonic order, $n=0,1,2,\dots$ \\
+$\omega$ & continuous angular frequency (aperiodic signals) \\
+$\tau$ & rectangular pulse width; also a dummy integration variable \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Orthogonal Functions and Orthogonal Decomposition of Signals}
+
+\subsection{Sets of Orthogonal Functions}
+
+\begin{definition*}
+If
+\[
+    \int_{t_1}^{t_2}\varphi_1(t)\,\varphi_2(t)\,\dd t=0,
+\]
+then $\varphi_1(t)$ and $\varphi_2(t)$ are said to be \textbf{orthogonal} on
+$[t_1,t_2]$. $n$ functions that are pairwise orthogonal form an
+\textbf{orthogonal set} $\{\varphi_1,\varphi_2,\dots,\varphi_n\}$.
+\end{definition*}
+
+\textbf{Completeness}\quad If there is no function
+$\phi(t)\notin\{\varphi_i\}$ such that for every $i$
+\[
+    \int_{t_1}^{t_2}\phi(t)\,\varphi_i(t)\,\dd t=0,
+\]
+then the set is a \textbf{complete orthogonal set}.
+
+\textbf{Complex function sets}\quad The orthogonality condition becomes an
+inner product with conjugation:
+\[
+    \int_{t_1}^{t_2}\varphi_i(t)\,\varphi_j^{*}(t)\,\dd t=
+    \begin{cases}
+        0, & i\neq j,\\[2pt]
+        k_i\neq 0, & i=j .
+    \end{cases}
+\]
+
+\begin{note}
+\textbf{Why this analogy is legitimate}
+
+Anything closed under linear operations can be regarded as a ``vector''. A
+continuous function is an infinite-dimensional vector: its value at each point
+of the independent variable is one coordinate,
+\[
+    f(x)=\lim_{\Delta x\to 0}\bigl(f(a),\,f(a+\Delta x),\,f(a+2\Delta x),\,\dots\bigr).
+\]
+Multiplying two functions pointwise on $[a,b]$ and summing (integrating) gives
+their inner product; a vanishing inner product means ``perpendicular'' --- this
+is exactly the geometric meaning of orthogonality.
+\end{note}
+
+\subsection{Decomposing a Signal into Orthogonal Functions}
+
+Approximate with finitely many terms:
+\[
+    f(t)\approx\sum_{j=1}^{n}c_j\varphi_j(t).
+\]
+Measure the quality of the approximation by the \textbf{mean-square error}
+(called the root-mean-square error in some texts):
+\[
+    \overline{\epsilon^{2}}\ \overset{\mathrm{def}}{=}\
+    \frac{1}{t_2-t_1}\int_{t_1}^{t_2}
+    \Bigl[f(t)-\sum_{j=1}^{n}c_j\varphi_j(t)\Bigr]^{2}\dd t .
+\]
+The error is squared so that positive and negative deviations cannot cancel
+each other.
+
+\textbf{Optimal coefficients}\quad Set
+$\partial\overline{\epsilon^{2}}/\partial c_j=0$ and use orthogonality,
+$\int\varphi_i\varphi_j=0\ (i\neq j)$:
+\[
+    \frac{\partial}{\partial c_j}\int_{t_1}^{t_2}
+    \Bigl[f(t)-\sum_{i}c_i\varphi_i(t)\Bigr]^{2}\dd t
+    =\int_{t_1}^{t_2}\bigl[-2f(t)\varphi_j(t)+2c_j\varphi_j^{2}(t)\bigr]\dd t=0,
+\]
+hence
+\[
+    \boxed{\;
+    c_j=\frac{\displaystyle\int_{t_1}^{t_2}f(t)\varphi_j(t)\,\dd t}
+             {\displaystyle\int_{t_1}^{t_2}\varphi_j^{2}(t)\,\dd t}
+       =\frac{1}{k_j}\int_{t_1}^{t_2}f(t)\varphi_j(t)\,\dd t\;}
+\]
+where $k_j=\displaystyle\int_{t_1}^{t_2}\varphi_j^{2}(t)\,\dd t$.
+
+\textbf{Minimum mean-square error}\quad Substituting back,
+\[
+    \overline{\epsilon^{2}}=\frac{1}{t_2-t_1}
+    \left[\int_{t_1}^{t_2}f^{2}(t)\,\dd t-\sum_{j=1}^{n}c_j^{2}k_j\right].
+\]
+Since $\overline{\epsilon^{2}}\ge 0$, more terms mean smaller error; as
+$n\to\infty$ with a complete set, $\overline{\epsilon^{2}}\to 0$, and then
+\[
+    \int_{t_1}^{t_2}f^{2}(t)\,\dd t=\sum_{j=1}^{\infty}c_j^{2}k_j,
+    \qquad
+    f(t)=\sum_{j=1}^{\infty}c_j\varphi_j(t).
+\]
+This energy equality is \textbf{Parseval's equation}.
+
+\section{Fourier Series}
+
+The Fourier series is Parseval's equation specialized to the trigonometric
+orthogonal basis.
+
+\subsection{Trigonometric Form}
+
+\begin{equation}
+    f(t)=\frac{a_0}{2}+\sum_{n=1}^{\infty}
+    \bigl[a_n\cos(n\Omega t)+b_n\sin(n\Omega t)\bigr].
+\end{equation}
+The coefficients (from the general formula of the previous section with
+$\varphi_j$ taken as $\cos n\Omega t$, $\sin n\Omega t$ and $k=\frac{T}{2}$):
+\[
+    a_n=\frac{2}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)\cos(n\Omega t)\,\dd t
+    \quad(n\ge 0),
+\]
+\[
+    b_n=\frac{2}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)\sin(n\Omega t)\,\dd t
+    \quad(n\ge 1).
+\]
+Here $\dfrac{a_0}{2}=\dfrac{1}{T}\displaystyle\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)\,\dd t$
+is the DC component.
+
+\subsection{Amplitude--Phase Form}
+
+Using the auxiliary-angle identity
+$a_n\cos\theta+b_n\sin\theta=\sqrt{a_n^{2}+b_n^{2}}\,\cos\bigl(\theta-\arctan\frac{b_n}{a_n}\bigr)$:
+\[
+    f(t)=\frac{A_0}{2}+\sum_{n=1}^{\infty}A_n\cos(n\Omega t+\varphi_n),
+\]
+\[
+    A_0=a_0,\qquad A_n=\sqrt{a_n^{2}+b_n^{2}},\qquad
+    \varphi_n=-\arctan\frac{b_n}{a_n}.
+\]
+The term with $\omega=\Omega$ is the \textbf{fundamental}; terms at $n\Omega$
+are the \textbf{$n$-th harmonics}.
+
+\subsection{Convergence and the Gibbs Phenomenon}
+
+More harmonics give a waveform closer to the original signal (except at
+discontinuities). Near a discontinuity the spike shrinks toward the jump as
+$n$ grows, but the \textbf{overshoot does not decrease with $n$}; its limit is
+about $9\%$ --- the \textbf{Gibbs phenomenon}.
+
+\begin{note}
+\textbf{Derivation of the $9\%$ Gibbs overshoot}
+
+Take the square wave
+\[
+    f(x)=
+    \begin{cases}
+        \ \ 1, & 0<x<\pi,\\
+        -1, & -\pi<x<0,
+    \end{cases}
+    \qquad
+    f(x)=\frac{4}{\pi}\sum_{k=0}^{\infty}\frac{\sin(2k+1)x}{2k+1}.
+\]
+The partial sum is
+\[
+    S_N(x)=\frac{4}{\pi}\sum_{k=0}^{N}\frac{\sin(2k+1)x}{2k+1}
+    =\frac{4}{\pi}\int_0^{x}\sum_{k=0}^{N}\cos(2k+1)t\,\dd t .
+\]
+With the kernel identity
+$\displaystyle\sum_{k=0}^{N}\cos(2k+1)t=\frac{\sin(2N+2)t}{2\sin t}$,
+\[
+    S_N(x)=\frac{4}{\pi}\int_0^{x}\frac{\sin(2N+2)t}{2\sin t}\,\dd t
+    =\frac{2}{\pi}\int_0^{(2N+2)x}
+    \frac{\sin u}{(2N+2)\sin\frac{u}{2N+2}}\,\dd u,
+\]
+where we substituted $u=(2N+2)t$, $\dd t=\dfrac{\dd u}{2N+2}$.
+
+Let $N\to\infty$; then $(2N+2)\sin\frac{u}{2N+2}\to u$, and
+\[
+    \lim_{N\to\infty}S_N(x)=\frac{2}{\pi}\int_0^{\infty}\frac{\sin u}{u}\,\dd u
+    \ \xrightarrow{\ X\to\infty\ }\
+    F(X)=\frac{2}{\pi}\int_0^{X}\frac{\sin u}{u}\,\dd u .
+\]
+$F'(X)=0$ at $X=n\pi$, so the first extremum is at $X=\pi$:
+\[
+    F(\pi)=\frac{2}{\pi}\Si(\pi)=1.17898 .
+\]
+Relative to the jump of size $2$, the overshoot ratio is
+\[
+    \delta=\frac{1.17898-1}{2}\approx 0.0895\approx 9\% .
+\]
+\end{note}
+
+\subsection{Even/Odd Symmetry and Half-Wave Symmetry}
+
+\textbf{(1) $f(t)$ even} $\Rightarrow b_n=0$,
+\[
+    a_n=\frac{4}{T}\int_0^{\frac{T}{2}}f(t)\cos(n\Omega t)\,\dd t,\qquad
+    A_n=|a_n|,\quad \varphi_n=m\pi .
+\]
+
+\textbf{(2) $f(t)$ odd} $\Rightarrow a_n=0$,
+\[
+    b_n=\frac{4}{T}\int_0^{\frac{T}{2}}f(t)\sin(n\Omega t)\,\dd t .
+\]
+
+\textbf{(3) Odd-harmonic functions (half-wave symmetry)}\quad If
+\[
+    f(t)=-f\!\left(t\pm\frac{T}{2}\right),
+\]
+then only \textbf{odd} harmonics appear; even harmonics are absent.
+
+\subsection{Exponential Form}
+
+\begin{equation}
+    f(t)=\sum_{n=-\infty}^{\infty}F_n e^{jn\Omega t},
+    \qquad
+    F_n=\frac{1}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)e^{-jn\Omega t}\,\dd t .
+\end{equation}
+The complex coefficients can be written $F_n=|F_n|e^{j\varphi_n}$.
+
+\begin{note}
+\textbf{Key point of the derivation}\quad The self-product integral of the
+basis $e^{jn\Omega t}$ is
+$\int_{-T/2}^{T/2}e^{jn\Omega t}\bigl(e^{jn\Omega t}\bigr)^{*}\dd t=T$,
+while distinct $n$ give $0$; thus $k=T$, and the general formula of the
+previous section applies directly.
+\end{note}
+
+\subsection{Relation Between the Two Forms}
+
+From Euler's formula
+\[
+    \cos x=\frac{e^{jx}+e^{-jx}}{2},
+\]
+\[
+\begin{aligned}
+    f(t)&=\frac{A_0}{2}+\sum_{n=1}^{\infty}\frac{A_n}{2}
+          \Bigl[e^{j(n\Omega t+\varphi_n)}+e^{-j(n\Omega t+\varphi_n)}\Bigr]\\
+        &=\frac{1}{2}\sum_{n=-\infty}^{\infty}A_n e^{j\varphi_n}e^{jn\Omega t}.
+\end{aligned}
+\]
+Hence
+\[
+    F_n=\frac{1}{2}A_n e^{j\varphi_n},\qquad |F_n|=\frac{1}{2}A_n .
+\]
+That is, \textbf{the double-sided spectrum has half the amplitude of the
+single-sided one}; the negative- and positive-frequency terms of the
+double-sided spectrum together synthesize each physical component of the
+single-sided spectrum.
+
+\section{Spectra of Periodic Signals}
+
+From $f(t)=\dfrac{A_0}{2}+\sum A_n\cos(n\Omega t+\varphi_n)$ or
+$f(t)=\sum F_ne^{jn\Omega t}$, a periodic signal is completely determined by
+$\Omega$, the amplitudes, and the initial phases of its harmonics. Plotting
+amplitude or phase against $n\Omega$ (or $n$) gives the \textbf{spectrum}.
+
+\begin{table}[htbp]
+\centering
+\caption{The two spectrum representations}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Form & Range of $n$ & Name \\
+\midrule
+trigonometric, $A_n,\varphi_n$ & $n\in[1,+\infty)$ & single-sided spectrum \\
+exponential, $F_n$ & $n\in(-\infty,+\infty)$ & double-sided spectrum \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For \textbf{real signals}: the double-sided amplitude spectrum is even and the
+double-sided phase spectrum is odd (this fails for complex signals).
+
+\subsection{Spectrum of a Periodic Rectangular Pulse}
+
+\[
+\begin{aligned}
+    F_n&=\frac{1}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)e^{-jn\Omega t}\,\dd t
+        =\frac{1}{T}\int_{-\frac{\tau}{2}}^{\frac{\tau}{2}}e^{-jn\Omega t}\,\dd t\\
+       &=\frac{2}{T}\cdot\frac{\sin\left(\dfrac{n\Omega\tau}{2}\right)}{n\Omega}
+        =\frac{\tau}{T}\cdot
+         \frac{\sin\left(\dfrac{n\Omega\tau}{2}\right)}{\dfrac{n\Omega\tau}{2}}
+        =\frac{\tau}{T}\,\Sa\!\left(\frac{n\Omega\tau}{2}\right).
+\end{aligned}
+\]
+where $\Sa(x)=\dfrac{\sin x}{x}$ is the sampling function.
+
+\begin{itemize}
+    \item The spectrum is \textbf{discrete}, with line spacing
+          $\Omega=\dfrac{2\pi}{T}$: the larger $T$, the denser the lines;
+    \item the envelope is governed by $\Sa$, with zeros at
+          $\dfrac{n\Omega\tau}{2}=k\pi$, i.e.\ $f=\dfrac{k}{\tau}$;
+    \item the energy is concentrated inside the first zero; define the
+          \textbf{bandwidth}
+    \[
+        0\le f\le\frac{1}{\tau},\qquad \Delta F=\frac{1}{\tau}.
+    \]
+\end{itemize}
+
+As $T\to\infty$ the line spacing tends to zero and the discrete spectrum
+becomes continuous --- this is precisely how the Fourier transform arises.
+
+\begin{figure}[htbp]
+\centering
+\caption{Spectrum of a periodic rectangular pulse (discrete lines with a
+$\Sa$-shaped envelope)}
+\end{figure}
+
+\section{Power of Periodic Signals and Parseval's Identity}
+
+The average power is
+\[
+    P=\frac{1}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f^{2}(t)\,\dd t .
+\]
+Substituting the trigonometric series and using orthogonality of the
+trigonometric system:
+\[
+    P=\frac{A_0^{2}}{4}+\sum_{n=1}^{\infty}\frac{A_n^{2}}{2}
+     =P_{\text{DC}}+P_{\text{AC}} .
+\]
+Since $|F_n|=\frac{1}{2}A_n$,
+\[
+    \boxed{\;P=\sum_{n=-\infty}^{\infty}|F_n|^{2}\;}
+\]
+--- \textbf{Parseval's identity}: the time-domain average power equals the sum
+of the powers of all spectral lines.
+
+\section{The Fourier Transform}
+
+\subsection{From Series to Transform}
+
+A periodic signal $f_T(t)=\sum F_ne^{jn\Omega t}$ with
+$F_n=\frac{1}{T}\int_{-T/2}^{T/2}f_T(t)e^{-jn\Omega t}\dd t$. Let $T\to\infty$:
+
+\begin{itemize}
+    \item the line spacing $\Omega\to\dd\omega$, and the discrete sum becomes
+          an integral;
+    \item the amplitudes tend to zero, so the \textbf{spectral density}
+          $F(j\omega)$ replaces $F_n$.
+\end{itemize}
+
+\[
+    f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}
+    \left[\int_{-\infty}^{\infty}f(\tau)e^{-j\omega\tau}\,\dd\tau\right]
+    e^{j\omega t}\,\dd\omega .
+\]
+Hence the definitions
+\[
+    \boxed{\;F(j\omega)=\int_{-\infty}^{\infty}f(t)e^{-j\omega t}\,\dd t\;}
+    \qquad\text{(Fourier transform)}
+\]
+\[
+    \boxed{\;f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)e^{j\omega t}\,\dd\omega\;}
+    \qquad\text{(inverse Fourier transform)}
+\]
+written $\mathcal{F}[f(t)]=F(j\omega)$,
+$\mathcal{F}^{-1}[F(j\omega)]=f(t)$. $F(j\omega)$ is called the
+\textbf{spectral density function}.
+
+\subsection{Two Ways of Writing the Complex Spectrum}
+
+\[
+    F(j\omega)=|F(j\omega)|e^{j\varphi(\omega)}=R(\omega)+jX(\omega).
+\]
+From the inverse transform (using that $|F|$ is even and $\varphi$ is odd),
+the real and imaginary parts correspond to cosine and sine components:
+\[
+    f(t)=\frac{1}{\pi}\int_0^{\infty}|F(j\omega)|\cos\bigl(\omega t+\varphi(\omega)\bigr)\,\dd\omega .
+\]
+Thus a real aperiodic signal is a continuous superposition of cosines of
+amplitude $\dfrac{|F(j\omega)|\dd\omega}{\pi}$.
+
+\subsection{Even/Odd Symmetry of Signals and Symmetry of the Spectrum}
+
+Substituting $e^{-j\omega t}=\cos\omega t-j\sin\omega t$ into the definition:
+\[
+    F(j\omega)=\underbrace{\int_{-\infty}^{\infty}f(t)\cos\omega t\,\dd t}_{R(\omega)}
+    -j\underbrace{\int_{-\infty}^{\infty}f(t)\sin\omega t\,\dd t}_{-X(\omega)},
+\]
+\[
+    R(\omega)=\int_{-\infty}^{\infty}f(t)\cos\omega t\,\dd t
+    \quad(\text{even in }\omega),
+\]
+\[
+    X(\omega)=-\int_{-\infty}^{\infty}f(t)\sin\omega t\,\dd t
+    \quad(\text{odd in }\omega).
+\]
+Therefore
+\[
+    |F(-j\omega)|=|F(j\omega)|\ \ (\text{even}),\qquad
+    \varphi(-\omega)=-\varphi(\omega)\ \ (\text{odd}),
+\]
+\[
+    \boxed{\;F(-j\omega)=F^{*}(j\omega)\;}\qquad(\text{real signal, conjugate symmetry}).
+\]
+The phase angle is
+\[
+    \varphi(\omega)=\arctan\frac{X(\omega)}{R(\omega)} .
+\]
+
+\begin{table}[htbp]
+\centering
+\caption{Special cases for real signals}
+\small
+\begin{tabular}{@{}p{0.20\linewidth}p{0.74\linewidth}@{}}
+\toprule
+$f(t)$ & Conclusion \\
+\midrule
+real \textbf{even} function & $X(\omega)=0$,
+$F(j\omega)=R(\omega)=2\displaystyle\int_0^{\infty}f(t)\cos\omega t\,\dd t$,
+real and even \\
+real \textbf{odd} function & $R(\omega)=0$,
+$F(j\omega)=jX(\omega)=-2j\displaystyle\int_0^{\infty}f(t)\sin\omega t\,\dd t$,
+purely imaginary and odd \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Time reversal}\quad Let $\tau=-t$; then
+\[
+    \mathcal{F}[f(-t)]=\int_{-\infty}^{\infty}f(-t)e^{-j\omega t}\,\dd t
+    =\int_{-\infty}^{\infty}f(\tau)e^{j\omega\tau}\,\dd\tau
+    =F(-j\omega)=F^{*}(j\omega).
+\]
+
+\section{Fourier Transforms of Singularity Functions}
+
+\begin{note}
+\textbf{Remark}\quad The following signals are not absolutely integrable (one
+of the Dirichlet conditions); strictly speaking the results are limits, or
+transforms in the sense of generalized functions.
+\end{note}
+
+\textbf{(1) Unit impulse} $\delta(t)$
+\[
+    \mathcal{F}[\delta(t)]=\int_{-\infty}^{\infty}\delta(t)e^{-j\omega t}\,\dd t
+    =e^{0}=1 .
+\]
+Most concentrated in time $\Rightarrow$ perfectly uniform in frequency (a
+constant spectrum).
+
+\textbf{(2) Derivatives of the impulse}\quad Using
+$\displaystyle\int\delta^{(n)}(t)\varphi(t)\dd t=(-1)^{n}\varphi^{(n)}(0)$:
+\[
+    \mathcal{F}[\delta^{(n)}(t)]
+    =\int_{-\infty}^{\infty}\delta^{(n)}(t)e^{-j\omega t}\,\dd t
+    =(-1)^{n}\left.\frac{\dd^{n}}{\dd t^{n}}e^{-j\omega t}\right|_{t=0}
+    =(j\omega)^{n}.
+\]
+
+\textbf{(3) Unit DC} $f(t)=1$
+
+Take $f_1(t)=e^{-\alpha|t|}\xrightarrow{\alpha\to0}1$, while
+\[
+    F_1(j\omega)=\frac{2\alpha}{\alpha^{2}+\omega^{2}}
+    \ \xrightarrow{\alpha\to0}\
+    \begin{cases}
+        \infty, & \omega=0,\\
+        0, & \omega\neq 0,
+    \end{cases}
+\]
+with total strength
+\[
+    \lim_{\alpha\to0}\int_{-\infty}^{\infty}\frac{2\alpha}{\alpha^{2}+\omega^{2}}\,\dd\omega
+    =2\arctan\frac{\omega}{\alpha}\Big|_{-\infty}^{+\infty}=2\pi .
+\]
+Therefore
+\[
+    \mathcal{F}[1]=2\pi\delta(\omega).
+\]
+
+\textbf{(4) Signum function} $\sgn(t)$
+
+Take $f_2(t)=\sgn(t)e^{-\alpha|t|}$, so
+$F_2(j\omega)=\dfrac{-2j\omega}{\alpha^{2}+\omega^{2}}$; letting $\alpha\to0$:
+\[
+    \mathcal{F}[\sgn(t)]=\frac{2}{j\omega}\qquad(\omega\neq 0).
+\]
+
+\textbf{(5) Unit step}\quad
+$\varepsilon(t)=\dfrac{1}{2}+\dfrac{1}{2}\sgn(t)$
+\[
+    \mathcal{F}[\varepsilon(t)]=\pi\delta(\omega)+\frac{1}{j\omega}
+    =\pi\delta(\omega)-j\frac{1}{\omega}.
+\]
+
+\section{Properties of the Fourier Transform}
+
+\begin{table}[htbp]
+\centering
+\caption{Main properties of the Fourier transform
+($f(t)\lrarr F(j\omega)$)}
+\small
+\begin{tabular}{@{}p{0.26\linewidth}p{0.34\linewidth}p{0.34\linewidth}@{}}
+\toprule
+Property & Time domain & Frequency domain \\
+\midrule
+linearity & $af_1(t)+bf_2(t)$ & $aF_1(j\omega)+bF_2(j\omega)$ \\
+duality & $F(jt)$ & $2\pi f(-\omega)$ \\
+scaling & $f(at)$ & $\dfrac{1}{|a|}F\!\left(j\dfrac{\omega}{a}\right)$ \\
+time shifting & $f(t\pm t_0)$ & $e^{\pm j\omega t_0}F(j\omega)$ \\
+frequency shifting & $f(t)e^{\pm j\omega_0 t}$ & $F\bigl(j(\omega\mp\omega_0)\bigr)$ \\
+time-domain convolution & $f_1(t)*f_2(t)$ & $F_1(j\omega)F_2(j\omega)$ \\
+frequency-domain convolution & $f_1(t)f_2(t)$ & $\dfrac{1}{2\pi}F_1(j\omega)*F_2(j\omega)$ \\
+time-domain differentiation & $f^{(n)}(t)$ & $(j\omega)^{n}F(j\omega)$ \\
+time-domain integration & $f^{(-1)}(t)=\displaystyle\int_{-\infty}^{t}f(x)\dd x$
+         & $\pi F(0)\delta(\omega)+\dfrac{F(j\omega)}{j\omega}$ \\
+frequency-domain differentiation & $(-jt)^{n}f(t)$ & $F^{(n)}(j\omega)$ \\
+frequency-domain integration & $\pi f(0)\delta(t)+\dfrac{f(t)}{-jt}$ & $F^{(-1)}(j\omega)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Linearity}
+
+If
+\[
+    f_1(t)\lrarr F_1(j\omega),\qquad f_2(t)\lrarr F_2(j\omega),
+\]
+then
+\[
+    af_1(t)+bf_2(t)\lrarr aF_1(j\omega)+bF_2(j\omega).
+\]
+
+\subsection{Duality}
+
+If $f(t)\lrarr F(j\omega)$, then
+\[
+    F(jt)\lrarr 2\pi f(-\omega).
+\]
+
+\begin{note}
+\textbf{Proof}\quad From the inverse transform
+\[
+    f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)e^{j\omega t}\,\dd\omega,
+\]
+\[
+    f(-t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)e^{-j\omega t}\,\dd\omega .
+\]
+Swapping the names of the variables $t\leftrightarrow\omega$,
+\[
+    f(-\omega)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(jt)e^{-j\omega t}\,\dd t
+    =\frac{1}{2\pi}\mathcal{F}[F(jt)],
+\]
+so $F(jt)\lrarr 2\pi f(-\omega)$.
+\end{note}
+
+\subsection{Scaling}
+
+\[
+    f(at)\lrarr \frac{1}{|a|}F\!\left(j\frac{\omega}{a}\right).
+\]
+
+\begin{note}
+\textbf{Proof}\quad
+$\mathcal{F}[f(at)]=\displaystyle\int_{-\infty}^{\infty}f(at)e^{-j\omega t}\,\dd t$.
+For $a>0$, set $at=x$; then
+\[
+    \mathcal{F}[f(at)]=\frac{1}{a}\int_{-\infty}^{\infty}f(x)e^{-j\omega\frac{x}{a}}\,\dd x
+    =\frac{1}{a}F\!\left(j\frac{\omega}{a}\right).
+\]
+For $a<0$ the limits of integration reverse and an extra minus sign appears;
+combining it with $|a|$ gives the general formula.
+\end{note}
+
+The duration of a signal and its occupied bandwidth are inversely related.
+
+\subsection{Time Shifting}
+
+If $f(t)\lrarr F(j\omega)$ and $t_0$ is a constant, then
+\[
+    f(t\pm t_0)\lrarr e^{\pm j\omega t_0}F(j\omega).
+\]
+
+\begin{note}
+\textbf{Proof}\quad Let $x=t\pm t_0$:
+\[
+    \int_{-\infty}^{\infty}f(t\pm t_0)e^{-j\omega t}\,\dd t
+    =\int_{-\infty}^{\infty}f(x)e^{-j\omega(x\mp t_0)}\,\dd x
+    =e^{\pm j\omega t_0}F(j\omega).
+\]
+\end{note}
+
+\subsection{Frequency Shifting}
+
+If $f(t)\lrarr F(j\omega)$, then
+\[
+    f(t)e^{\pm j\omega_0 t}\lrarr F\bigl(j(\omega\mp\omega_0)\bigr).
+\]
+This is the theoretical basis of modulation (spectrum shifting).
+
+\subsection{The Convolution Theorem}
+
+\textbf{Time-domain convolution theorem}\quad If
+$f_1(t)\lrarr F_1(j\omega)$ and $f_2(t)\lrarr F_2(j\omega)$, then
+\[
+    \mathcal{F}[f_1(t)*f_2(t)]=F_1(j\omega)F_2(j\omega).
+\]
+
+\begin{note}
+\textbf{Proof}\quad
+\[
+\begin{aligned}
+    \mathcal{F}[f_1(t)*f_2(t)]
+    &=\int_{-\infty}^{\infty}\left[\int_{-\infty}^{\infty}f_1(\tau)f_2(t-\tau)\,\dd\tau\right]
+      e^{-j\omega t}\,\dd t\\
+    &=\int_{-\infty}^{\infty}f_1(\tau)
+      \left[\int_{-\infty}^{\infty}f_2(t-\tau)e^{-j\omega t}\,\dd t\right]\dd\tau\\
+    &=\int_{-\infty}^{\infty}f_1(\tau)e^{-j\omega\tau}F_2(j\omega)\,\dd\tau
+      =F_1(j\omega)F_2(j\omega).
+\end{aligned}
+\]
+\end{note}
+
+\textbf{Frequency-domain convolution theorem}\quad If
+$f_1(t)\lrarr F_1(j\omega)$ and $f_2(t)\lrarr F_2(j\omega)$, then
+\[
+    f_1(t)f_2(t)\lrarr\frac{1}{2\pi}F_1(j\omega)*F_2(j\omega).
+\]
+The proof is analogous: use the definitions, interchange the order of
+integration, and apply the frequency-shifting property.
+
+\subsection{Time-Domain Differentiation and Integration}
+
+Define
+\[
+    f^{(n)}(t)=\frac{\dd^{n}f(t)}{\dd t^{n}},\qquad
+    f^{(-1)}(t)=\int_{-\infty}^{t}f(x)\,\dd x .
+\]
+If $f(t)\lrarr F(j\omega)$, then
+\[
+    f^{(n)}(t)\lrarr(j\omega)^{n}F(j\omega),
+\]
+\[
+    f^{(-1)}(t)\lrarr\pi F(0)\delta(\omega)+\frac{F(j\omega)}{j\omega},
+\]
+where
+\[
+    F(0)=\int_{-\infty}^{\infty}f(t)\,\dd t .
+\]
+
+\begin{note}
+Sometimes $f(t)=g'(t)$ but
+$g(t)\neq f^{(-1)}(t)=\displaystyle\int_{-\infty}^{t}f(x)\dd x$. Whether the
+two coincide depends on whether $g(-\infty)$ is zero: only when
+$g(-\infty)=0$ does $g(t)$ equal the running integral of $f(t)$; otherwise
+they differ by a constant (which appears in the frequency domain as the term
+$\pi F(0)\delta(\omega)$).
+\end{note}
+
+\subsection{Frequency-Domain Differentiation and Integration}
+
+If $f(t)\lrarr F(j\omega)$, then
+\[
+    (-jt)^{n}f(t)\lrarr F^{(n)}(j\omega),
+\]
+\[
+    \pi f(0)\delta(t)+\frac{f(t)}{-jt}\lrarr F^{(-1)}(j\omega),
+\]
+where
+\[
+    f(0)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)\,\dd\omega .
+\]
+
+\section{Fourier Transform of Periodic Signals}
+
+For the periodic signal
+\[
+    f_T(t)=\sum_{n=-\infty}^{\infty}F_ne^{jn\Omega t},
+    \qquad
+    F_n=\frac{1}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)e^{-jn\Omega t}\,\dd t,
+\]
+we get
+\[
+    \mathcal{F}[f_T(t)]=2\pi\sum_{n=-\infty}^{\infty}F_n\,\delta(\omega-n\Omega),
+\]
+i.e.\ the spectrum of a periodic signal is a train of equally spaced impulses
+of strength $2\pi F_n$.
+
+\subsection{Relation Between Fourier Coefficients and the Transform}
+
+Extending a single pulse $f_0(t)$ periodically with period $T$ can be written
+as a convolution with a periodic impulse train:
+\[
+    f_T(t)=f_0(t)*\delta_T(t),
+    \qquad
+    \delta_T(t)=\sum_{n=-\infty}^{\infty}\delta(t-nT).
+\]
+By the time-domain convolution theorem and
+$\mathcal{F}[\delta_T(t)]=\Omega\displaystyle\sum_{n=-\infty}^{\infty}\delta(\omega-n\Omega)$,
+$\Omega=\dfrac{2\pi}{T}$:
+\[
+    \mathcal{F}[f_T(t)]
+    =F_0(j\omega)\,\Omega\,\delta_{\Omega}(\omega)
+    =\Omega\sum_{n=-\infty}^{\infty}F_0(jn\Omega)\,\delta(\omega-n\Omega).
+\]
+Comparing the impulse strengths $2\pi F_n=\Omega T F_n$ with the above,
+\[
+    F_n=\frac{1}{T}F_0(jn\Omega),
+\]
+i.e.\ \textbf{the Fourier coefficient of a periodic signal equals the spectrum
+of one single pulse, sampled at $n\Omega$, divided by $T$}.
+
+\section{Frequency-Domain Analysis of LTI Systems}
+
+\subsection{Frequency Response}
+
+The Fourier transform decomposes a signal into a sum of complex exponentials
+of infinitely many frequencies, so first study the response of a system to a
+complex exponential. From $y(t)=h(t)*f(t)$,
+\[
+    y(t)=\int_{-\infty}^{\infty}h(\tau)f(t-\tau)\,\dd\tau
+    =\int_{-\infty}^{\infty}h(\tau)e^{-j\omega\tau}\,\dd\tau\;e^{j\omega t}
+    =H(j\omega)e^{j\omega t}.
+\]
+So the zero-state response to a complex exponential is a complex exponential
+of the same frequency, multiplied by the coefficient $H(j\omega)$. Moreover,
+since
+\[
+    f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)e^{j\omega t}\,\dd\omega,
+\]
+each frequency component is $\dfrac{F(j\omega)\dd\omega}{2\pi}e^{j\omega t}$,
+and by linearity
+\[
+    y(t)=\int_{-\infty}^{\infty}H(j\omega)\frac{F(j\omega)\,\dd\omega}{2\pi}e^{j\omega t}
+    =\frac{1}{2\pi}\int_{-\infty}^{\infty}H(j\omega)F(j\omega)e^{j\omega t}\,\dd\omega .
+\]
+Hence
+\[
+    Y(j\omega)=H(j\omega)F(j\omega),
+\]
+which is precisely the \textbf{time-domain convolution theorem}. $H(j\omega)$
+is called the \textbf{frequency response} (system function):
+\[
+    H(j\omega)=\frac{Y(j\omega)}{F(j\omega)} .
+\]
+
+\subsection{Frequency-Domain Analysis}
+
+Convolution of signals in the time domain corresponds to multiplication of
+their spectra in the frequency domain.
+
+\begin{note}
+\textbf{Example}\quad A system is described by
+\[
+    y'(t)+2y(t)=f(t),
+\]
+Find the response to the input $f(t)=e^{-t}\varepsilon(t)$.
+
+\textbf{Solution}\quad Transform the time-domain equation into the frequency
+domain:
+\[
+    j\omega Y(j\omega)+2Y(j\omega)=F(j\omega),
+\]
+so the frequency response is
+\[
+    H(j\omega)=\frac{Y(j\omega)}{F(j\omega)}=\frac{1}{j\omega+2}.
+\]
+Since
+\[
+    F(j\omega)=\frac{1}{j\omega+1},
+\]
+we have
+\[
+    Y(j\omega)=\frac{1}{(j\omega+2)(j\omega+1)}
+    =\frac{1}{j\omega+1}-\frac{1}{j\omega+2},
+\]
+and the inverse transform gives
+\[
+    y(t)=\bigl(e^{-t}-e^{-2t}\bigr)\varepsilon(t).
+\]
+\end{note}
+
+\subsection{Distortionless Transmission}
+
+Distortionless transmission means the output differs from the input only in
+amplitude and time of occurrence, without any change of waveform. With input
+$f(t)$,
+\[
+    y(t)=Kf(t-t_0),
+    \qquad
+    Y(j\omega)=Ke^{-j\omega t_0}F(j\omega),
+\]
+so the frequency response must be
+\[
+    H(j\omega)=Ke^{-j\omega t_0},
+\]
+with impulse response
+\[
+    h(t)=K\delta(t-t_0).
+\]
+That is: \textbf{a constant magnitude response together with a phase response
+that is a straight line through the origin} is necessary and sufficient for
+distortionless transmission.
+
+\subsection{Response of the Ideal Low-Pass Filter}
+
+An ideal low-pass filter passes signals with angular frequency below
+$\omega_c$ without distortion and blocks those above $\omega_c$. The passing
+range is the passband and the blocked range the stopband.
+
+Let the cutoff angular frequency be $\omega_c$, with
+$|H(j\omega)|=1$ in the passband and phase $\varphi(\omega)=-\omega t_0$;
+then
+\[
+    H(j\omega)=
+    \begin{cases}
+        e^{-j\omega t_0}, & |\omega|<\omega_c,\\
+        0, & |\omega|>\omega_c,
+    \end{cases}
+\]
+which is a gate function of width $2\omega_c$:
+\[
+    H(j\omega)=e^{-j\omega t_0}g_{2\omega_c}(\omega).
+\]
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=7.2cm, height=4.2cm,
+    xmin=-4.2, xmax=4.2, ymin=0, ymax=1.35,
+    xlabel={$\omega$}, ylabel={$|H(j\omega)|$},
+    axis lines=middle,
+    xtick={-3,0,3}, xticklabels={$-\omega_c$,$0$,$\omega_c$},
+    ytick={0,1},
+    title={Magnitude response},
+    title style={font=\small},
+]
+    \addplot[blue, very thick, const plot]
+        coordinates {(-4.2,0) (-3,0) (-3,1) (3,1) (3,0) (4.2,0)};
+\end{axis}
+\end{tikzpicture}
+\hspace{6mm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=7.2cm, height=4.2cm,
+    xmin=-4.2, xmax=4.2, ymin=-0.9, ymax=0.9,
+    xlabel={$\omega$}, ylabel={$\varphi(\omega)$},
+    axis lines=middle,
+    xtick={-3,0,3}, xticklabels={$-\omega_c$,$0$,$\omega_c$},
+    ytick={-0.6,0,0.6},
+    title={Phase response (in the passband)},
+    title style={font=\small},
+]
+    \addplot[red, very thick, domain=-3:3] {-0.25*x};
+\end{axis}
+\end{tikzpicture}
+\caption{Frequency characteristics of the ideal low-pass filter}
+\end{figure}
+
+\subsubsection{Impulse Response}
+
+\[
+    h(t)=\mathcal{F}^{-1}\bigl[e^{-j\omega t_0}g_{2\omega_c}(\omega)\bigr].
+\]
+By duality: $g_\tau(t)\lrarr\tau\Sa\!\left(\dfrac{\tau}{2}\omega\right)$, so
+$\tau\Sa\!\left(\dfrac{\tau}{2}t\right)\lrarr 2\pi g_\tau(-\omega)=2\pi g_\tau(\omega)$.
+Taking $\tau=2\omega_c$ and including the time-shift factor,
+\[
+    h(t)=\frac{\omega_c}{\pi}\,\Sa\bigl[\omega_c(t-t_0)\bigr].
+\]
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=11cm, height=5cm,
+    xmin=-4, xmax=4, ymin=-0.45, ymax=1.25,
+    xlabel={$t$}, ylabel={$h(t)$},
+    axis lines=middle,
+    xtick={-3,-2,-1,0,1,2,3},
+    ytick={0,0.5,1},
+    samples=200,
+    legend pos=north east,
+]
+    \addplot[blue, thick, domain=-4:-0.02] {sin(deg(3*x))/(3*x)};
+    \addplot[blue, thick, domain=0.02:4]  {sin(deg(3*x))/(3*x)};
+    \addlegendentry{$h(t)=\dfrac{\omega_c}{\pi}\Sa(\omega_c t)$}
+\end{axis}
+\end{tikzpicture}
+\caption{Impulse response of the ideal low-pass filter
+($\omega_c=3$, $t_0=0$)}
+\end{figure}
+
+\subsubsection{Step Response}
+
+Let $g(t)$ be the step response of the ideal low-pass filter; it is the
+convolution of $h(t)$ with the unit step:
+\[
+    g(t)=h(t)*\varepsilon(t)=\int_{-\infty}^{t}h(\tau)\,\dd\tau
+    =\int_{-\infty}^{t}\frac{\omega_c}{\pi}\Sa\bigl[\omega_c(\tau-t_0)\bigr]\dd\tau,
+\]
+\[
+    g(t)=\int_{-\infty}^{t}\frac{\omega_c}{\pi}
+    \frac{\sin\bigl[\omega_c(\tau-t_0)\bigr]}{\omega_c(\tau-t_0)}\,\dd\tau
+    =\frac{1}{2}+\frac{1}{\pi}\Si\bigl[\omega_c(t-t_0)\bigr],
+\]
+where
+\[
+    \Si(x)=\int_0^{x}\frac{\sin\eta}{\eta}\,\dd\eta .
+\]
+The step response starts to build up before $t=t_0$ and still oscillates
+afterwards, which shows that the ideal low-pass filter is \textbf{non-causal}
+and physically unrealizable; it can only be approximated.
+
+\section{Chapter Summary}
+
+\begin{enumerate}
+    \item Everything grows out of \textbf{orthogonality} --- a vanishing inner
+          product lets each coefficient be extracted independently.
+    \item Series $\to$ transform: as $T\to\infty$, $F_n$ tends to zero and the
+          gaps between spectral lines close, so \textbf{density} replaces
+          amplitude and \textbf{integration} replaces summation.
+    \item The spectrum of a real signal is necessarily \textbf{conjugate
+          symmetric}, which is why looking only at the half $\omega\ge0$
+          suffices.
+    \item Time-domain convolution equals frequency-domain multiplication, so
+          LTI system analysis in the frequency domain reduces to the algebraic
+          relation $Y=HF$ --- this is the whole value of frequency-domain
+          analysis.
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,69 @@
+\contentsline {chapter}{\numberline {1\hspace {.3em}}Introduction}{1}{chapter.1}%
+\contentsline {chapter}{\numberline {2\hspace {.3em}}Time-Domain Analysis of Continuous-Time Systems}{2}{chapter.2}%
+\contentsline {section}{\numberline {2.1}The Classical Solution of Differential Equations}{2}{section.2.1}%
+\contentsline {section}{\numberline {2.2}On the Values at $0_{-}$ and $0_{+}$}{3}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}The Integration Method}{3}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}The Undetermined-Coefficient Method}{4}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Zero-Input Response}{4}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Zero-State Response}{5}{section.2.4}%
+\contentsline {section}{\numberline {2.5}The Complete Response}{5}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Impulse Response and Step Response}{5}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Impulse Response}{5}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Step Response}{7}{subsection.2.6.2}%
+\contentsline {section}{\numberline {2.7}Zero-State Response and the Convolution Integral}{7}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Zero-State Response and the Convolution Integral}{8}{section.2.8}%
+\contentsline {subsection}{\numberline {2.8.1}Properties of the Convolution Integral}{8}{subsection.2.8.1}%
+\contentsline {subsection}{\numberline {2.8.2}Convolution with the Impulse Function}{9}{subsection.2.8.2}%
+\contentsline {subsection}{\numberline {2.8.3}Differentiation and Integration of Convolution}{9}{subsection.2.8.3}%
+\contentsline {chapter}{\numberline {3\hspace {.3em}}Time-Domain Analysis of Discrete-Time Systems}{11}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Differences and Difference Equations}{11}{section.3.1}%
+\contentsline {section}{\numberline {3.2}The Classical Solution of Difference Equations}{12}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}The Homogeneous Solution}{12}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}The Particular Solution}{13}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Zero-Input and Zero-State Responses}{13}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}The Unit Sequence and the Unit Sequence Response}{13}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}The Unit Sequence Response}{14}{subsection.3.3.1}%
+\contentsline {section}{\numberline {3.4}Zero-State Response and the Convolution Sum}{14}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Zero-State Response to an Arbitrary Input}{14}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}The Convolution Sum}{14}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Properties of the Convolution Sum}{14}{subsection.3.4.3}%
+\contentsline {chapter}{\numberline {4\hspace {.3em}}The Fourier Transform and Frequency-Domain Analysis}{16}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Notational Conventions}{16}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Orthogonal Functions and Orthogonal Decomposition of Signals}{16}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Sets of Orthogonal Functions}{16}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Decomposing a Signal into Orthogonal Functions}{17}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Fourier Series}{18}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Trigonometric Form}{18}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Amplitude--Phase Form}{18}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Convergence and the Gibbs Phenomenon}{18}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Even/Odd Symmetry and Half-Wave Symmetry}{19}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Exponential Form}{20}{subsection.4.3.5}%
+\contentsline {subsection}{\numberline {4.3.6}Relation Between the Two Forms}{20}{subsection.4.3.6}%
+\contentsline {section}{\numberline {4.4}Spectra of Periodic Signals}{20}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Spectrum of a Periodic Rectangular Pulse}{21}{subsection.4.4.1}%
+\contentsline {section}{\numberline {4.5}Power of Periodic Signals and Parseval's Identity}{21}{section.4.5}%
+\contentsline {section}{\numberline {4.6}The Fourier Transform}{21}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}From Series to Transform}{21}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Two Ways of Writing the Complex Spectrum}{22}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Even/Odd Symmetry of Signals and Symmetry of the Spectrum}{22}{subsection.4.6.3}%
+\contentsline {section}{\numberline {4.7}Fourier Transforms of Singularity Functions}{23}{section.4.7}%
+\contentsline {section}{\numberline {4.8}Properties of the Fourier Transform}{24}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}Linearity}{24}{subsection.4.8.1}%
+\contentsline {subsection}{\numberline {4.8.2}Duality}{24}{subsection.4.8.2}%
+\contentsline {subsection}{\numberline {4.8.3}Scaling}{25}{subsection.4.8.3}%
+\contentsline {subsection}{\numberline {4.8.4}Time Shifting}{25}{subsection.4.8.4}%
+\contentsline {subsection}{\numberline {4.8.5}Frequency Shifting}{25}{subsection.4.8.5}%
+\contentsline {subsection}{\numberline {4.8.6}The Convolution Theorem}{25}{subsection.4.8.6}%
+\contentsline {subsection}{\numberline {4.8.7}Time-Domain Differentiation and Integration}{26}{subsection.4.8.7}%
+\contentsline {subsection}{\numberline {4.8.8}Frequency-Domain Differentiation and Integration}{26}{subsection.4.8.8}%
+\contentsline {section}{\numberline {4.9}Fourier Transform of Periodic Signals}{27}{section.4.9}%
+\contentsline {subsection}{\numberline {4.9.1}Relation Between Fourier Coefficients and the Transform}{27}{subsection.4.9.1}%
+\contentsline {section}{\numberline {4.10}Frequency-Domain Analysis of LTI Systems}{27}{section.4.10}%
+\contentsline {subsection}{\numberline {4.10.1}Frequency Response}{27}{subsection.4.10.1}%
+\contentsline {subsection}{\numberline {4.10.2}Frequency-Domain Analysis}{28}{subsection.4.10.2}%
+\contentsline {subsection}{\numberline {4.10.3}Distortionless Transmission}{28}{subsection.4.10.3}%
+\contentsline {subsection}{\numberline {4.10.4}Response of the Ideal Low-Pass Filter}{29}{subsection.4.10.4}%
+\contentsline {subsubsection}{Impulse Response}{29}{subsubsection*.13}%
+\contentsline {subsubsection}{Step Response}{30}{subsubsection*.15}%
+\contentsline {section}{\numberline {4.11}Chapter Summary}{30}{section.4.11}%
+\contentsfinish 
