@@ -1,0 +1,49 @@
+% ============================================================
+%  指数信号 c e^{at}：a>0 与 a<0 的两幅并列子图
+%  用法：放在 \chapter 里，直接粘贴，或 \input{片段-指数信号子图}
+%  依赖：pgfplots + subcaption（_preamble.tex 第 22、35 行已加载）
+%  颜色：accent 深靛蓝 / warm 赤陶，均为模板已定义颜色
+% ============================================================
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          width=\linewidth, height=4.6cm,
+          axis lines=middle,
+          xmin=-1.2, xmax=3.2, ymin=0, ymax=5.2,
+          xtick={-1,1,2,3}, ytick={1},
+          xlabel={$t$}, ylabel={$f(t)$},
+          tick label style={font=\small}, label style={font=\small},
+          samples=160, domain=-1.2:3.2,
+          every axis plot/.append style={line width=1pt},
+        ]
+        \addplot[accent] {exp(0.5*x)};                    % a = +0.5
+        \node[accent, anchor=north east] at (axis cs:3.05,2.35) {$c e^{at}$};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{$a>0$：指数增长}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          width=\linewidth, height=4.6cm,
+          axis lines=middle,
+          xmin=-1.2, xmax=3.2, ymin=0, ymax=2.2,
+          xtick={-1,1,2,3}, ytick={1},
+          xlabel={$t$}, ylabel={$f(t)$},
+          tick label style={font=\small}, label style={font=\small},
+          samples=160, domain=-1.2:3.2,
+          every axis plot/.append style={line width=1pt},
+        ]
+        \addplot[warm] {exp(-0.5*x)};                     % a = -0.5
+        \node[warm, anchor=north east] at (axis cs:2.95,2.10) {$c e^{at}$};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{$a<0$：指数衰减}
+  \end{subfigure}
+  \caption{指数信号 $c e^{at}$ 在 $a$ 取正、负两种情形下的波形（取 $c=1$）}
+  \label{fig:exp-signal}
+\end{figure}

@@ -1,0 +1,1886 @@
+% !TEX root = ./信号与系统笔记.tex
+% !TEX program = xelatex
+% 模板部分（字体/版式/封面/盒子/目录样式）全部在 _preamble.tex 里
+\input{_preamble}
+\usepackage{subcaption}                   % 并排子图 subfigure
+\usepackage{ctex}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\begin{document}
+\maketitle
+\frontmatter
+\tableofcontents
+
+\chapter*{全书脉络}
+\addcontentsline{toc}{chapter}{全书脉络}
+\markboth{全书脉络}{}
+
+\begin{tcolorbox}[notebox,colback=white,borderline west={2.4pt}{0pt}{accent},
+                  left=16pt,right=10pt,top=10pt,bottom=10pt]
+\centering
+\begin{tikzpicture}[
+  >=Stealth,
+  root/.style={fill=accent,text=white,rounded corners=2pt,
+               font=\sffamily\bfseries,inner sep=7pt},
+  partn/.style={draw=accent,text=accent,rounded corners=2pt,line width=0.9pt,
+                font=\sffamily\bfseries,inner sep=5pt},
+  chapn/.style={draw=muted,text=ink,rounded corners=2pt,line width=0.7pt,
+                font=\sffamily,inner sep=4pt,align=center,text width=2.5cm},
+  leaf/.style={font=\small,text=muted,align=left,inner sep=0pt,text width=3.5cm},
+  edge/.style={-{Stealth[length=6pt,width=5pt]},line width=1pt,draw=accent}
+]
+  \node[root] (root) at (0,0) {信号与系统};
+
+  \node[partn] (p1) at (4.3,2.1) {第一编\quad 基础};
+  \node[partn] (p2) at (4.3,0)   {第二编\quad 时域};
+  \node[partn] (p3) at (4.3,-2.1){第三编\quad 频域};
+
+  \node[chapn] (c1) at (7.9,2.1) {第 1 章\\基本概念};
+  \node[chapn] (c2) at (7.9,0.7) {第 2 章\\连续系统时域};
+  \node[chapn] (c3) at (7.9,-0.7){第 3 章\\离散系统时域};
+  \node[chapn] (c4) at (7.9,-2.1){第 4 章\\傅里叶频域};
+
+  \node[leaf,anchor=west] (l1) at (9.9,2.1) {信号分类与运算\\常见信号\\冲激与阶跃函数};
+  \node[leaf,anchor=west] (l2) at (9.9,0.7) {微分方程经典解\\零输入 / 零状态响应\\卷积积分};
+  \node[leaf,anchor=west] (l3) at (9.9,-0.7){差分方程经典解\\单位序列响应\\卷积和};
+  \node[leaf,anchor=west] (l4) at (9.9,-2.1){傅里叶级数与变换\\八大性质\\LTI 频域分析};
+
+  \draw[edge] (root.east) -- (4.0,2.1) -- (p1.west);
+  \draw[edge] (root.east) -- (p2.west);
+  \draw[edge] (root.east) -- (4.0,-2.1) -- (p3.west);
+
+  \draw[edge] (p1.east) -- (c1.west);
+  \draw[edge] (p2.east) -- (7.5,0.7) -- (c2.west);
+  \draw[edge] (p2.east) -- (7.5,-0.7) -- (c3.west);
+  \draw[edge] (p3.east) -- (c4.west);
+
+  \draw[edge] (c1.east) -- (l1.west);
+  \draw[edge] (c2.east) -- (l2.west);
+  \draw[edge] (c3.east) -- (l3.west);
+  \draw[edge] (c4.east) -- (l4.west);
+\end{tikzpicture}
+\end{tcolorbox}
+
+\vspace{6pt}
+\noindent{\sffamily\color{muted}\small 全书按「先认识信号 → 再解时域方程 → 最后换到频域」三编推进：
+第一编建立信号与冲激的语言，第二编在时域里直接求解连续与离散系统，第三编用傅里叶变换把卷积化为乘法。}
+
+
+\mainmatter
+\clearpage
+
+% ==================================================================
+\part{信号与系统基础}
+
+\chapter{信号与系统基本概念}
+\chaptertoc
+% ==================================================================
+\section{绪论}
+本门课聚焦于信号论与系统论，旨在探讨信号的表示、分析和处理方法，以及系统的行为和特性。 \\
+信号在数学上表示为当个或多个变量的函数.
+\\
+\\
+\begin{figure}[htbp]
+{
+\centering
+\begin{tikzpicture}[
+    >=Stealth,
+    arr/.style={-{Stealth[length=10pt, width=7pt]}, line width=1.2pt},
+    box/.style={draw, line width=1.6pt, minimum width=2.4cm, minimum height=2.4cm,
+                font=\Large, inner sep=0pt},
+    lbl/.style={font=\normalsize, text=black!85, inner sep=0pt}
+  ]
+
+  \node[box] (sys) {系统};
+
+  \draw[arr] (-4.4,0) -- (sys.west);
+  \node[lbl, above=4pt] at (-2.3,0.22) {输入信号};
+  \node[lbl, below=4pt] at (-2.3,-0.22) {激励};
+
+  \draw[arr] (sys.east) -- (4.4,0);
+  \node[lbl, above=4pt] at (2.3,0.22) {输出信号};
+  \node[lbl, below=4pt] at (2.3,-0.22) {响应};
+    
+\end{tikzpicture}
+\caption{信号与系统}
+}\end{figure}
+\section{信号能量与功率}
+对于任意连续和离散时间的信号我们可以定义其能量为
+\[
+\int_{t_1}^{t_2}|x(t)|^2\,dt,\quad
+\sum_{n=n_1}^{n_2}|x(n)|^2
+\]
+对于一个系统,我们关心的是无穷区间的能量或者功率,这样我们将总能量和总功率定义为
+\[
+E_\infty=\int_{-\infty}^{\infty}|x(t)|^2\,dt,\quad
+P_\infty=\lim_{T\to\infty}\frac{1}{T}\int_{-T/2}^{T/2}|x(t)|^2\,dt
+\]
+根据这个极限是不是发散我们将信号分为能量有限信号和功率有限信号.
+但也有能量和功率都不有限的信号7
+\section{信号}
+\subsection{信号的分类}
+\subsubsection{连续信号和离散信号}
+\begin{definition}
+    \key{连续信号}是指在时间上连续变化的信号，即在任意两个时间点之间都存在信号值。\key{形式化的},在连续时间范围
+    $(-\infty < t < \infty)$有定义的信号叫做连续时间信号。连续的要求只有定义域是连续的,而不要求信号值是连续的。比如阶跃信号$\epsilon(t)$\\
+\end{definition}
+\begin{definition}
+    \key{离散信号}是指在时间上只在离散的时间点上有定义的信号，即信号值只在特定的时间点上存在。离散信号通常由连续信号经过采样得到。\\
+\end{definition}
+%===
+\subsubsection{周期信号与非周期信号}
+\begin{definition}
+    \key{周期信号}是指在时间上具有周期性重复的信号，即信号在一定时间间隔后会重复出现相同的波形。周期信号可以用一个基本周期来描述整个信号的行为。\\
+\end{definition}
+
+\begin{definition}
+    \key{非周期信号}是指在时间上没有固定的周期性重复的信号，即信号的波形不会在一定时间间隔后重复出现。非周期信号通常具有更复杂的变化模式。\\
+\end{definition}
+
+\section{信号的基本运算}
+\subsection{加法与乘法}
+\quad 信号$f_1(\cdot)$与信号 $f_2(\cdot)$相加,指将两信号之值对应相加,得到新信号$f(\cdot)$,即
+\begin{equation}
+    f(t)=f_1(t)+f_2(t)
+\end{equation}
+这个运算的实际意义是将两个信号叠加在一起,得到一个新的信号.比如调音台.
+\quad 信号$f_1(\cdot)$与信号 $f_2(\cdot)$相乘,指将两信号之值对应相乘,得到新信号$f(\cdot)$,即
+\begin{equation}
+    f(t)=f_1(t)\cdot f_2(t)
+\end{equation}
+这个运算的实际意义是将两个信号的幅度相乘,得到一个新的信号.比如载波.
+\subsection{信号的时移,反转,尺度变换}
+时移变换代表信号在时间轴上向左或向右移动,即将信号的时间变量加上一个常数.\\
+反转变换代表信号在时间轴上关于原点对称,即将信号的时间变量取负.\\
+尺度变换代表信号在时间轴上进行压缩或扩展,即将信号的时间变量乘以一个常数.\\ 
+\section{常见信号}
+\subsection{连续时间复指数信号与正弦信号}
+连续时间复指数信号的定义为
+\begin{definition}
+    \[
+    x(t) = C e^{\alpha t}
+    \]
+$C\text{和}\alpha$一般为复数
+\end{definition}
+根据参数的不同,连续时间复指数信号可以分为以下几类:
+\subsubsection{实指数信号}
+C和$\alpha$都为实数时,x(t)为实指数信号,其幅度随时间呈指数增长或衰减,相位恒定. 自然指数在现实中及其常见,比如电容放电,电感放电,人口增长等.图像如下
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          width=\linewidth, height=4.6cm,
+          axis lines=middle,
+          xmin=-1.2, xmax=3.2, ymin=0, ymax=5.2,
+          xtick={-1,1,2,3}, ytick={1},
+          xlabel={$t$}, ylabel={$f(t)$},
+          tick label style={font=\small}, label style={font=\small},
+          samples=160, domain=-1.2:3.2,
+          every axis plot/.append style={line width=1pt},
+        ]
+        \addplot[accent] {exp(0.5*x)};          % a = +0.5
+        \node[accent, anchor=north east] at (axis cs:3.05,2.35) {$c e^{at}$};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{$a>0$：指数增长}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+          width=\linewidth, height=4.6cm,
+          axis lines=middle,
+          xmin=-1.2, xmax=3.2, ymin=0, ymax=2.2,
+          xtick={-1,1,2,3}, ytick={1},
+          xlabel={$t$}, ylabel={$f(t)$},
+          tick label style={font=\small}, label style={font=\small},
+          samples=160, domain=-1.2:3.2,
+          every axis plot/.append style={line width=1pt},
+        ]
+        \addplot[warm] {exp(-0.5*x)};           % a = -0.5
+        \node[warm, anchor=north east] at (axis cs:2.95,2.10) {$c e^{at}$};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{$a<0$：指数衰减}
+  \end{subfigure}
+  \caption{指数信号 $c e^{at}$ 在 $a$ 取正、负两种情形下的波形（取 $c=1$）}
+  \label{fig:exp-signal}
+\end{figure}
+\subsubsection{周期复指数信号和正弦信号}
+  若$\alpha$被限制为纯虚数,特别是如下信号。
+\[
+x(t)=e^{j\omega_0 t}
+\]
+这个信号是一个周期函数,其基波周期为$T_0=\frac{2\pi}{|\omega_0|}$,其幅度恒定为1,相位随时间线性变化.\par
+与周期复指数信号密切相关的是周期正弦信号
+\[
+x(t)=A\cos(\omega_0 t+\phi)
+\]
+它的基波周期与复指数周期信号相同\par
+根据欧拉关系,复指数信号可以用同基波周期的正弦函数表示,即
+\[
+e^{j\omega_0 t}=\cos(\omega_0 t)+j\sin(\omega_0 t)
+\]\par
+同理,正弦函数也可以用复指数信号表示,即
+\[
+A\cos(\omega_0 t+\phi)=\frac{A}{2}(e^{j\omega_0 t} e^{j\phi}+e^{-j\omega_0 t} e^{-j\phi})=A Re\{e^{j\omega_0 t} e^{j\phi}\}
+\]\par
+接下来,我们考虑一下复指数周期信号的能量与频率。我们可以计算发现其能量和功率分别为
+\begin{equation*}
+    E_\infty=\int_{-\infty}^{\infty}|e^{j\omega_0 t}|^2\,dt=\int_{-\infty}^{\infty}1\,dt=\infty
+\end{equation*}
+\begin{equation*}
+     p_\infty=\lim_{T\to\infty}\frac{1}{T}\int_{-T/2}^{T/2}|e^{j\omega_0 t}|^2\,dt=\lim_{T\to\infty}\frac{1}{T}\int_{-T/2}^{T/2}1\,dt=1
+\end{equation*}
+\subsubsection{一般复指数信号}
+对于一个一般的复指数信号$Ce^{\alpha t}$.将C用极坐标表示,$\alpha $用笛卡尔坐标系
+\[C=|C|e^{j\theta}\]
+\[\alpha=r+j\omega_0\]
+\[
+Ce^{\alpha t}=|C|e^{j\theta}e^{(r+j\omega_0)t}=|C|e^{rt}e^{j(\omega_0 t+\theta)}=|C|e^{rt}[\cos(\omega_0 t+\theta)+j\sin(\omega_0 t+\theta)]
+\]
+其实部这种振幅指数衰减的正弦信号为阻尼正弦振荡
+\subsection{离散时间复指数信号与正弦信号}
+\begin{definition}
+    离散时间复指数信号的定义为
+    \[
+    x[n] =C \alpha^{n}= C e^{\beta n}
+    \]
+\end{definition}
+\subsubsection{实指数信号}\par
+如果C和$\alpha$都是实数,则$x[n]$为实指数信号。性质与连续类似。
+\subsubsection{正弦信号}\par
+若$\beta$为纯虚数,就会得到一个重要序列.
+以一下序列为例
+\[
+x[n]=e^{j\omega_0 n}
+\]
+这个序列与正弦信号紧密相关
+\[
+x[n]=Acos(\omega_0 n+\phi)
+\]
+类似于前面我们可以通过欧拉公式得到如下关系式
+\[
+e^{j\omega_0 n}=cos(\omega_0 n)+j sin(\omega_0 n)
+\]
+\[
+Acos(\omega_0 n+\phi)=\frac{A}{2}(e^{j\omega_0 n} e^{j\phi}+e^{-j\omega_0 n} e^{-j\phi})=A Re\{e^{j\omega_0 n} e^{j\phi}\}
+\]
+\subsection{离散时间复指数序列的周期性}\par
+在这里我们发现了离散和连续的两大区别.我们在连续复指数信号当中，$e^{j\omega_0 t}$对任意的$\omega_0$都是周期的,$\omega_0$越大,振荡速率越快.但是在离散时间复指数信号当中,并不是所有的$\omega_0$都是周期的,$\omega_0$的正相关性也不一定成立.我们可以通过如下推导来说明这个问题。
+\begin{equation*}
+    e^{j(\omega_0+2\pi)n}=e^{j\omega_0 n}e^{2\pi n}=e^{j\omega_0 n}
+\end{equation*}
+\qquad 我们发现离散复指数信号在两个频率是完全一样的.所以我们研究其性质时,选取任意一个$2\pi$范围内的$\omega$即可。
+在0到$\pi$的过程当中,振荡速率越来愈大.\par 但当超过$\pi$之后,出现混叠现象,信号相位看着像顺时针旋转,所以振荡速率减小.\\
+\qquad 接下来讨论离散时间复指数信号的\key{周期性问题}.为了使得信号$e^{j\omega_0 n}$是周期的,周期为N>0,就必须有
+\[
+e^{j\omega_0 (n+N)}=e^{j\omega_0 n}
+\]
+等价于式子
+\begin{equation}
+     e^{j\omega_0 N}=1
+\end{equation}
+所以满足$\omega_0 N=2\pi m$.\\
+\qquad 我们关注一下离散时间信号的基波周期和频率.对于一个周期离散复指数信号$e^{j\omega_0 n}$.满足$\omega_0/2\pi=m/N$,而且可以证明
+若m和N 互质。基波周期就是N,基波频率是$2\pi/N=\omega_0/m$。
+\begin{note}
+    \point{证明}:\\
+    \[
+    \qquad  x[n]=e^{jm(2\pi/N)n}\\
+    \]
+    \text{我们假设其基波周期为N0,则有}\\
+    \[e^{jm(2\pi/N)(n+N_0)}=e^{jm(2\pi/N)n}\]\\
+    \text{所以}
+    \[e^{jm(2\pi/N)N_0}=1\\\]
+    \text{所以}
+    \[
+    k*(2\pi)=m(2\pi/N)N_0\\
+    \]
+    化简得到
+    \[N_0=\frac{kN}{m}\]
+根据数学知识我们知道满足条件$N_0$的最小值为
+\[
+N_0=\frac{N/gcd(m,N)}{m/gcd(m,N)}*m/gcd(m,N)=N/gcd(m,N)
+\]
+\color{red}{\key{特别的,若m,N互质}}, 基波周期为$N$
+\end{note}
+\qquad  我们最后在考虑组成\key{谐波关系}的周期离散时间复指数信号,它们含有公共的周期N,所以基波周期能被N整除.也意味这谐波频率都是
+$2\pi/N$的整数倍.即
+\[\phi_k[n]=e^{jk(2\pi/N)n}\]
+\qquad 但与连续时间信号不同,在这样一组信号当中\key{只有N个互不相同的周期复指数信号}.
+\section{单位冲激函数和单位阶跃函数}
+\subsection{离散时间单位脉冲与单位阶跃序列}
+\qquad 最简单的离散时间信号之一就是单位脉冲
+\[
+\delta[n]=
+\begin{cases}
+    0,&n\neq 0\\
+    1,&n=0
+\end{cases}
+\]
+\qquad 另一个就是单位阶跃信号 
+\[
+u[n]=
+\begin{cases}
+    0,&n<  0\\
+    1,&n \geq 0
+\end{cases}
+\]
+根据后续学习我们发现单位脉冲是单位阶跃信号的\key{一阶差分}.相反,单位阶跃信号是单位脉冲的求和函数.
+单位脉冲有一个重要性质,\key{采样性质 }
+\[
+x[n]*\delta[n-n_0]=x[n-n_0]
+\]
+\begin{note}
+我们根据上式可以把任意离散时间信号表示为单位脉冲的线性组合
+\[x[n]=\sum_{k=-\infty}^{\infty}x[n]*\delta[n-k]\]
+\qquad 这个形式像什么东西,感觉是不是像向量.\par
+\qquad 我们将一个信号或者说一个函数当作一个无穷维度的向量,那么被求和项就像在某一个单位基向量上的分量
+我们又发现$\delta[n-k]$是相互正交的单位基向量。\par
+\qquad 所以采样性质就相当于将一个信号在无穷维度上进行了分解后的分量.
+\end{note}
+\subsection{连续时间单位阶跃函数和单位冲激函数}
+\qquad 连续时间下的单位阶跃函数u(t)定义为 
+\[
+u(t)=\begin{cases}
+    0,&t<0\\
+    1,&t> 0
+\end{cases}
+\]
+\qquad 同离散我们，单位冲激函数$\delta(t)$定义为
+\[
+\delta(t)=\begin{cases}
+    0,&t\neq 0\\
+    \infty,&t=0
+\end{cases}
+\]
+\qquad 这个信号可以从极限获得,我们假设单位阶跃信号的值的变化要从0到$\Delta$,所以
+\[\delta_{\Delta}(t)=\frac{u_{\Delta}(t)}{dt}\]
+\qquad 当$\Delta \to 0$时,得到单位冲激函数.\par 
+\qquad 单位冲激函数也有采样性质,即\[
+    x(t)*\delta(t-t_0)=x(t-t_0)
+\]
+\section{连续时间系统和离散时间系统}
+\subsection{基本系统性质}
+\subsubsection{有记忆和无记忆系统}
+\qquad 如果对自变量的每一值都取仅仅取决于当前时间的输入,这个系统称为无记忆系统.反之则称为记忆系统.
+\subsubsection{可逆性与可逆系统}
+\qquad 如果一个系统存在逆系统,使得输入和输出之间存在一一对应的关系,则称该系统为可逆系统.反之则称为不可逆系统.
+\subsubsection{因果性}
+\qquad 如果一个系统的输出仅仅依赖于当前和过去的输入,则称该系统为因果系统.反之则称为非因果系统.无记忆系统一定是因果系统
+\subsubsection{稳定性}
+\qquad 如果一个系统的输出在有界输入下仍然是有界的,则称该系统为稳定系统.反之则称为不稳定系统.对于一个离散系统,假设输入是
+有界的,界是B,那么输出的最大值也有界,界是C.
+\subsubsection{时不变性}
+\qquad 如果一个系统的响应不随时间的平移而改变,则称该系统为时不变系统.反之则称为时变系统.若输出信号x(t)发生一个时移后,输出信号y(t)也发生同样的时移,则称该系统为时不变系统.反之则称为时变系统.
+\subsubsection{线性}
+\qquad 如果一个系统满足叠加原理,则称该系统为线性系统.反之则称为非线性系统.叠加原理又叫做齐次可加性下。形式化的
+若满足
+\[
+x(t)=\sum_{n=1}^{k}a_n x_n(t)\Rightarrow y(t)=\sum_{n=1}^{k}a_n y_n(t)
+\]
+其中y(t)是x(t)的响应,$y_n(t)$是$x_n(t)$的响应,则称该系统为线性系统.
+% ==================================================================
+\part{时域分析}
+
+\chapter{连续系统的时域分析}
+\chaptertoc
+% ==================================================================
+
+\section{微分方程的经典解}
+
+描述 LTI 连续系统激励与响应之间关系的数学模型是 $n$ 阶常系数线性微分方程，
+可以写作
+\[
+    \sum_{j=0}^{n}a_j\,y^{(j)}(t)=\sum_{i=0}^{m}b_i\,f^{(i)}(t).
+\]
+微分方程的全解由齐次解和特解组成，即
+\[
+    y(t)=y_h(t)+y_p(t).
+\]
+齐次解是齐次微分方程的解，其形式由特征根决定：
+
+\begin{table}[htbp]
+\centering
+\caption{齐次解 $y_h(t)$ 的形式}
+\small
+\begin{tabular}{@{}p{0.31\linewidth}p{0.61\linewidth}@{}}
+\toprule
+特征根 $\lambda$ & 齐次解 $y_h(t)$ \\
+\midrule
+单实根 & $e^{\lambda t}$ \\
+$r$ 重实根 & $(C_{r-1}t^{r-1}+C_{r-2}t^{r-2}+\cdots+C_1t+C_0)\,e^{\lambda t}$ \\
+一对共轭复根 $\lambda_{1,2}=\alpha\pm j\beta$ &
+$e^{\alpha t}\bigl(C\cos\beta t+D\sin\beta t\bigr)$ \\
+$r$ 重共轭复根 &
+$e^{\alpha t}\bigl[A_{r-1}t^{r-1}\cos(\beta t+\theta_{r-1})+\cdots+A_0\cos(\beta t+\theta_0)\bigr]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+特解的函数形式与激励的形式有关：
+
+\begin{table}[htbp]
+\centering
+\caption{特解 $y_p(t)$ 的形式}
+\small
+\begin{tabular}{@{}p{0.26\linewidth}p{0.40\linewidth}p{0.26\linewidth}@{}}
+\toprule
+激励 $f(t)$ & 特解 $y_p(t)$ & 条件 \\
+\midrule
+$t^{m}$ & $t^{r}\bigl(P_mt^{m}+P_{m-1}t^{m-1}+\cdots+P_0\bigr)$ &
+有 $r$ 重等于 $0$ 的特征根 \\
+$e^{\alpha t}$ & $\bigl(P_rt^{r}+P_{r-1}t^{r-1}+\cdots+P_1t+P_0\bigr)e^{\alpha t}$ &
+$\alpha$ 是 $r$ 重特征根 \\
+$\cos\beta t$ 或 $\sin\beta t$ & $P\cos\beta t+Q\sin\beta t$ &
+所有特征根都不等于 $j\beta$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{note}
+表中“$r$ 重”是通用写法：当激励与特征根不重合时取 $r=0$，
+此时特解不含 $t$ 的因子，就是普通的待定系数形式。
+\end{note}
+
+\section{关于 $0_{-}$ 与 $0_{+}$ 值}
+
+用经典法求解微分方程时，一般输入 $f(t)$ 是在 $t=0$ 接入系统的，方程的解适用于 $t>0$。
+确定解的结构所需的一组初始值指的是 $t=0_{+}$ 时刻的值。而在 $t=0_{-}$ 时激励尚未接入，
+系统的值与初始状态有关、与激励无关。某些激励接入系统时响应及其导数会发生跃变，
+因此要设法求出跃变值。
+
+\subsection{积分法}
+
+这个方法基于 $\delta(t)$、$\varepsilon(t)$、$t\varepsilon(t)$ 的积分性质以及零点处的性质：
+$\delta(t)$ 在零点处存在冲激，其积分 $\varepsilon(t)$ 在零点处发生跳变，
+而 $\varepsilon(t)$ 的积分 $t\varepsilon(t)$ 在零点处连续。
+
+\begin{note}
+\point{例}\quad 描述某 LTI 系统的微分方程为
+\[
+    y''(t)+3y'(t)+2y(t)=2f'(t)+6f(t),
+\]
+已知 $y(0_{-})=2$、$y'(0_{-})=0$、$f(t)=\varepsilon(t)$，求 $y(0_{+})$ 与 $y'(0_{+})$。
+
+\point{解}\quad 此处只计算初值。代入激励的具体形式 $f'(t)=\delta(t)$，得
+\[
+    y''(t)+3y'(t)+2y(t)=2\delta(t)+6\varepsilon(t).
+\]
+对等式两边从 $0_{-}$ 到 $0_{+}$ 积分：
+\[
+    \int_{0_{-}}^{0_{+}}y''(t)\,\dd t
+    +3\int_{0_{-}}^{0_{+}}y'(t)\,\dd t
+    +2\int_{0_{-}}^{0_{+}}y(t)\,\dd t
+    =2\int_{0_{-}}^{0_{+}}\delta(t)\,\dd t
+    +6\int_{0_{-}}^{0_{+}}\varepsilon(t)\,\dd t .
+\]
+观察方程的结构可以发现，$y''(t)$ 是唯一含有 $\delta(t)$ 项的部分，
+而 $y'(t)$ 在零点附近有界、$y(t)$ 连续，于是后两项的积分为零，右端第二项亦为零：
+\[
+    \bigl[y'(0_{+})-y'(0_{-})\bigr]+3\cdot 0+2\cdot 0=2+0 .
+\]
+所以
+\[
+    y'(0_{+})=2,\qquad y(0_{+})=y(0_{-})=2 .
+\]
+\end{note}
+
+\subsection{待定系数法}
+
+当激励中含有冲激函数的高阶导数时，积分法无法把它化为连续函数，
+也就得不到唯一解，只能得到一组多元方程。这种情况下可以采用待定系数法。
+
+\begin{note}
+\point{例}\quad 设
+\[
+    y''(t)+2y'(t)+y(t)=\delta''(t)+2\delta(t).
+\]
+要使等式成立，左右两端各项的系数应分别相同。由于 $y''(t)$ 必然含有 $\delta''(t)$ 项，
+设
+\[
+    y''(t)=a\,\delta''(t)+b\,\delta'(t)+c\,\delta(t)+r_0(t),
+\]
+逐次积分得
+\[
+    y'(t)=a\,\delta'(t)+b\,\delta(t)+r_1(t),
+    \qquad
+    y(t)=a\,\delta(t)+r_2(t).
+\]
+代回原方程并比较各项系数：
+\[
+    \begin{cases}
+        a=1,\\
+        b+2a=0,\\
+        c+2b+a=2,
+    \end{cases}
+    \quad\Longrightarrow\quad
+    a=1,\ b=-2,\ c=3 .
+\]
+再对 $y'(t)$、$y''(t)$ 中含冲激的部分积分，即可得到初始值。
+\end{note}
+
+\begin{warning}
+这里的 $r(t)$ 对应的是在零点附近积分为零的部分，不影响方程初值的计算，
+因此只需比较奇异项的系数。
+\end{warning}
+
+\section{零输入响应}
+
+仅仅由初始状态 $\{x(0)\}$ 所引起的响应称为零输入响应，用 $y_{zi}(t)$ 表示。
+在零输入条件下，微分方程等号右侧为零，化为齐次方程：
+\[
+    \sum_{j=0}^{n}a_j\,y_{zi}^{(j)}(t)=0 .
+\]
+若特征根都为单根，则
+\[
+    y_{zi}(t)=\sum_{j=1}^{n}C_{zij}\,e^{\lambda_j t}.
+\]
+因为输入为零，初始值即为系统初值，不存在跃变。
+
+\section{零状态响应}
+
+零状态是指系统初值为零，仅由输入信号 $f(t)$ 引起的响应，用 $y_{zs}(t)$ 表示：
+\[
+    \sum_{j=0}^{n}a_j\,y_{zs}^{(j)}(t)=\sum_{i=0}^{m}b_i\,f^{(i)}(t).
+\]
+若微分方程的特征根都为单根，零状态响应为
+\[
+    y_{zs}(t)=\sum_{j=1}^{n}C_{zsj}\,e^{\lambda_j t}+y_p(t),
+\]
+其中 $y_p(t)$ 为方程的特解。
+
+\section{全响应}
+
+\begin{keyeqn}
+    y(t)=y_{zi}(t)+y_{zs}(t),
+\end{keyeqn}
+其各阶导数同样满足线性关系
+\[
+    y^{(n)}(t)=y_{zi}^{(n)}(t)+y_{zs}^{(n)}(t).
+\]
+综上所述，LTI 系统的全响应既可以分解为零输入响应与零状态响应，
+也可以分解为自由响应与强迫响应：
+\[
+    y(t)=\sum_{j=1}^{n}C_j e^{\lambda_j t}+y_p(t)
+        =\sum_{j=1}^{n}C_{zij}e^{\lambda_j t}+\sum_{j=1}^{n}C_{zsj}e^{\lambda_j t}+y_p(t).
+\]
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{forest}
+    for tree={
+        grow'=0,
+        parent anchor=east,
+        child anchor=west,
+        edge path={
+            \noexpand\path[\forestoption{edge}] (!u.parent anchor) -- +(5pt,0) |- (.child anchor)\forestoption{edge label};
+        },
+        l sep=10pt,
+        s sep=4pt,
+        inner sep=1.5pt,
+        font=\small,
+        align=center,
+        draw,
+        rounded corners,
+    }
+    [全响应 $y(t)$
+        [零输入响应 $y_{zi}(t)$
+            [仅由初始状态决定]
+            [输入为零，无跃变]
+        ]
+        [零状态响应 $y_{zs}(t)$
+            [仅由激励决定]
+            [初值为零]
+        ]
+        [自由响应
+            [齐次解形式]
+            [系数由初值\\与激励共同决定]
+        ]
+        [强迫响应
+            [特解形式]
+            [由激励形式决定]
+        ]
+    ]
+\end{forest}}
+\caption{全响应的四种分解}
+\end{figure}
+
+\section{冲激响应和阶跃响应}
+
+\subsection{冲激响应}
+
+定义
+\begin{keyeq}
+    h(t)=T\bigl[\{0\},\delta(t)\bigr].
+\end{keyeq}
+
+\key{求解冲激响应的方法}
+
+LTI 系统一般有两种情况：一种是系统微分方程右侧只含有 $f(t)$，
+另一种是右端含有 $f(t)$ 及其各阶导数。利用 LTI 系统零状态响应的线性性质与微分性质，
+第二种可以转化为第一种：
+\[
+    \sum_{j=0}^{n}a_j\,y^{(j)}(t)=\sum_{j=0}^{m}b_j\,f^{(j)}(t).
+\]
+选择新变量 $y_1(t)$，使它满足的微分方程左端与原方程相同、右端只含 $f(t)$：
+\[
+    \sum_{j=0}^{n}a_j\,y_1^{(j)}(t)=f(t).
+\]
+设其冲激响应为 $h_1(t)$，根据线性性质与微分性质可得
+\[
+    h(t)=b_m h_1^{(m)}(t)+b_{m-1}h_1^{(m-1)}(t)+\cdots+b_0 h_1(t).
+\]
+
+\subsection{阶跃响应}
+
+定义
+\[
+    g(t)=T\bigl[\{0\},\varepsilon(t)\bigr].
+\]
+若方程右侧只含 $f(t)$，则
+\[
+    \begin{cases}
+        g^{(n)}(t)+a_{n-1}g^{(n-1)}(t)+\cdots+a_0g(t)=\varepsilon(t),\\[4pt]
+        g^{(j)}(0_{-})=0,\quad j=0,1,2,\dots,n-1 .
+    \end{cases}
+\]
+若特征根都为单根，则
+\begin{keyeq}
+    g(t)=\Bigl(\sum_{j=1}^{n}C_j e^{\lambda_j t}+\frac{1}{a_0}\Bigr)\varepsilon(t).
+\end{keyeq}
+由于 $\varepsilon(t)$ 是 $\delta(t)$ 的积分，$g(t)$ 也就是 $h(t)$ 的积分：
+$g(t)=\displaystyle\int_{-\infty}^{t}h(\tau)\,\dd\tau$，求出一个即可得到另一个。
+
+\section{零状态响应与卷积积分}
+
+LTI 系统的零状态响应等于激励与冲激响应的卷积积分。把激励分解为冲激的叠加
+\[
+    f(t)=\int_{-\infty}^{\infty}f(\tau)\,\delta(t-\tau)\,\dd\tau ,
+\]
+由线性与时不变性，每个冲激 $\delta(t-\tau)$ 产生的响应为 $h(t-\tau)$，故
+\begin{keyeqn}
+    y_{zs}(t)=\int_{-\infty}^{\infty}f(\tau)\,h(t-\tau)\,\dd\tau
+            =\int_{-\infty}^{\infty}h(\tau)\,f(t-\tau)\,\dd\tau
+            \overset{\mathrm{def}}{=}f(t)*h(t).
+\end{keyeqn}
+这就是\key{卷积积分}。它有交换律、分配律、结合律，以及与冲激函数的卷积
+$f(t)*\delta(t-t_0)=f(t-t_0)$；因果系统的 $h(t)$ 在 $t<0$ 时为零，
+此时积分下限可改为 $0$。因果激励下又可写为
+\[
+    y_{zs}(t)=f(t)*h(t)=\int_{0}^{t}f(\tau)h(t-\tau)\,\dd\tau .
+\]
+\subsection{卷积积分的脉冲分解推导}
+我们定义了宽度很窄的脉冲$p_n(t)$，其强度为1(即脉冲波形下的面积为1)
+\\
+对于任意的激励函数$f(t)$,我们将其拆分为许多脉冲宽度为$\Delta \tau$的窄脉冲
+\\
+第$k$个脉冲,其出现在$t=k\Delta\tau$时刻,高度为$f(k\Delta\tau)$,则可表示为$f(k\Delta \tau)\tau p_n(t-k\Delta \tau)$
+\begin{equation}
+    f_{\Delta}(t)=\sum_{k=-\infty}^{\infty}f(k\Delta \tau)\Delta \tau p_n(t-k\Delta \tau)
+\end{equation}
+在$\tau \rightarrow 0$时的极限为$f(t)$
+\begin{equation}
+    f(t)=\lim_{\tau \rightarrow 0}f_{\Delta}(t)=\int_{-\infty}^{\infty}f(\tau)\delta(t-\tau)d\tau
+\end{equation}
+通过上述过程,在微观上将$f(t)$拆分为无数冲激函数之和。由于LTI的线性和时不变性质,可以得到任意激励下的零状态响应为
+\begin{equation}
+    y_{zs}(t)=\int_{-\infty}^{\infty}f(\tau)h(t-\tau)d\tau
+\end{equation}
+这种运算定义为卷积积分.式（2.3-3）表明,LTI系统的零状态响应$y_{zs}(t)$是$f(t)$与冲激响应$h(t)$的卷积积分.记为
+\begin{equation}
+    y_{zs}(t)=f(t)* h(t)
+\end{equation}
+从微观上看激励$f(t)$被分解为无数冲激函数之和,每个冲激函数的强度都等于其发生位置处f(t)的值,根据LTI的线性性质,其引起的响应就等于所有冲激函数单独作用所引起的响应之和.
+
+由于时不变兴致,其引起的响应也发生了时移.根据线性性质,$t=t_0$处系统的响应等于所有激励单独作用产生的激励的和。
+\subsection{卷积积分的性质}
+\begin{equation}
+    f(t)=f_1(t)*f_2(t)=\int_{-\infty}^{\infty}f_1(\tau)f_2(t-\tau)d\tau
+\end{equation}
+\key{性质1(交换律)}\\
+\begin{equation}
+    f_1(t)*f_2(t)=f_2(t)*f_1(t)
+\end{equation}
+\begin{note}
+\point{证明}
+\begin{equation*}
+    \int_{-\infty}^{\infty}f_1(\tau)f_2(t-\tau)d\tau = \int_{-\infty}^{\infty}f_2(\tau)f_1(t-\tau)d\tau
+\end{equation*}
+\end{note}
+\key{性质2(分配律)}\\
+\begin{equation}
+    f_1(t)*[f_2(t)+f_3(t)]=f_1(t)*f_2(t)+f_1(t)*f_3(t)
+\end{equation} 
+\begin{note}
+\point{证明}
+\begin{equation*}
+    \int_{-\infty}^{\infty}f_1(\tau)[f_2(t-\tau)+f_3(t-\tau)]d\tau = \int_{-\infty}^{\infty}f_1(\tau)f_2(t-\tau)d\tau + \int_{-\infty}^{\infty}f_1(\tau)f_3(t-\tau)d\tau
+\end{equation*}
+\end{note}
+\key{性质3(结合律)}\\
+\begin{equation}
+    f_1(t)*[f_2(t)*f_3(t)]=[f_1(t)*f_2(t)]*f_3(t)
+\end{equation}
+\begin{note}
+\point{证明}
+\begin{equation*}
+    \int_{-\infty}^{\infty}f_1(\tau)[\int_{-\infty}^{\infty}f_2(\sigma)f_3(t-\tau-\sigma)d\sigma]d\tau = \int_{-\infty}^{\infty}[\int_{-\infty}^{\infty}f_1(\tau)f_2(\sigma)d\tau]f_3(t-\sigma)d\sigma
+\end{equation*}
+\end{note}  
+
+% ==================================================================
+\subsection{函数与冲激函数的卷积}
+% ==================================================================
+函数与冲激函数的卷积利用交换律可得
+\[
+f(t)*\delta(t)=\delta(t)*f(t)=\int_{-\infty}^{\infty}\delta(\tau)f(t-\tau)d\tau=f(t)
+\]
+即
+\[
+f(t)*\delta(t)=\delta(t)*f(t)=f(t)
+\]
+进一步拓展
+\[
+f(t)*\delta(t-t_0)=\delta(t-t_0)*f(t)=f(t-t_0)
+\]
+此外还有
+\[
+f(t-t_1)*\delta(t-t_2)=\delta(t-t_2)*f(t-t_1)=f(t-t_1-t_2)
+\]
+\subsection{卷积的微分和积分}
+\begin{definition*}
+   \[ f^{(1)}(t)=\frac{df(t)}{dt}
+   \]
+\end{definition*}
+\begin{definition*}
+   \[ f^{(-1)}(t)=\int_{-\infty}^t f(\tau)d\tau
+   \]
+\end{definition*}
+若
+\[
+f(t)=f_1(t)*f_2(t)=f_2(t)*f_1(t)
+\]
+\[
+    f^{(1)}(t)=f_1^{(1)}(t)*f_2(t)=f_1(t)*f_2^{(1)}(t)
+\]
+\[
+    f^{(-1)}(t)=f_1^{(-1)}(t)*f_2(t)=f_1(t)*f_2^{(-1)}(t)
+\]
+\key{一般化结论}
+\[
+    f^{(i)}(t)=f_1^{(j)}(t)*f_2^{(i-j)}(t)
+\]
+% ==================================================================
+\chapter{离散系统的时域分析}
+\chaptertoc
+% ==================================================================
+
+\section{差分与差分方程}
+
+定义一阶前向差分为
+\[
+    \Delta f(k)=f(k+1)-f(k),
+\]
+一阶后向差分为
+\[
+    \nabla f(k)=f(k)-f(k-1).
+\]
+二者性质相同，以下以后向差分为例。验证线性性质：
+\[
+\begin{aligned}
+\nabla\bigl[a_1f_1(k)+a_2f_2(k)\bigr]
+&= \bigl[a_1f_1(k)+a_2f_2(k)\bigr]-\bigl[a_1f_1(k-1)+a_2f_2(k-1)\bigr]\\
+&= a_1\bigl[f_1(k)-f_1(k-1)\bigr]+a_2\bigl[f_2(k)-f_2(k-1)\bigr]\\
+&= a_1\nabla f_1(k)+a_2\nabla f_2(k).
+\end{aligned}
+\]
+因此差分满足线性性质。
+
+再定义 $n$ 阶差分
+\[
+    \nabla^{n}f(k)=\nabla\bigl[\nabla^{n-1}f(k)\bigr]
+    =\sum_{j=0}^{n}(-1)^{j}\dbinom{n}{j}f(k-j).
+\]
+差分方程则是关于变量 $k$ 的未知序列 $y(k)$ 及各阶差分的方程式，一般写作
+\[
+    F\bigl(k,y(k),\nabla y(k),\dots,\nabla^{n}y(k)\bigr)=0 .
+\]
+因为 $n$ 阶差分可以写作 $y(k)$ 及各移位序列的线性组合，故又可写作
+\[
+    G\bigl(k,y(k),y(k-1),y(k-2),\dots,y(k-n)\bigr)=0 .
+\]
+描述离散 LTI 系统的是常系数线性差分方程。差分方程可以通过迭代法求数值解。
+
+\section{差分方程的经典解}
+
+对单输入—单输出的离散 LTI 系统，激励为 $f(k)$、全响应为 $y(k)$，
+其数学模型为 $n$ 阶常系数线性差分方程：
+\[
+    \sum_{j=0}^{n}a_{n-j}\,y(k-j)=\sum_{i=0}^{m}b_{m-i}\,f(k-i).
+\]
+上述差分方程的解由齐次解和特解两部分组合而成：
+\[
+    y(k)=y_h(k)+y_p(k).
+\]
+
+\subsection{齐次解}
+
+齐次方程
+\[
+    y(k)+a_{n-1}y(k-1)+a_{n-2}y(k-2)+\cdots+a_0y(k-n)=0
+\]
+的解称为齐次解。以一阶差分方程为例：
+\[
+    y(k)+ay(k-1)=0
+    \quad\Longrightarrow\quad
+    \frac{y(k)}{y(k-1)}=-a,
+\]
+这是等比数列的形式，故 $y(k)$ 应形如
+\[
+    y(k)=C_0(-a)^{k}.
+\]
+对 $n$ 阶差分方程，其齐次解是由 $C\lambda^{k}$ 的序列组合而成。代入齐次方程得
+\[
+    C\lambda^{k}+a_{n-1}C\lambda^{k-1}+a_{n-2}C\lambda^{k-2}+\cdots+a_0C\lambda^{k-n}=0 .
+\]
+消去 $C$ 与 $\lambda^{k-n}$：
+\[
+    \lambda^{n}+a_{n-1}\lambda^{n-1}+\cdots+a_1\lambda+a_0=0 .
+\]
+这就是差分方程的\key{特征方程}，不同的根对应不同形式的齐次解：
+
+\begin{table}[htbp]
+\centering
+\caption{齐次解 $y_h(k)$ 的形式}
+\small
+\begin{tabular}{@{}p{0.30\linewidth}p{0.62\linewidth}@{}}
+\toprule
+特征根 $\lambda$ & 齐次解 $y_h(k)$ \\
+\midrule
+单实根 & $C\lambda^{k}$ \\
+$r$ 重实根 & $\Bigl(\sum_{i=0}^{r-1}C_i k^{i}\Bigr)\lambda^{k}$ \\
+一对共轭复根 $\lambda_{1,2}=a\pm bi=\rho e^{\pm j\theta}$ &
+$\rho^{k}\bigl(C\cos\beta k+D\sin\beta k\bigr)$ 或 $A\rho^{k}\cos(\beta k+\theta)$ \\
+$r$ 重共轭复根 &
+$\rho^{k}\Bigl(\sum_{i=0}^{r-1}A_i k^{r-1}\cos(\beta k+\theta_i)\Bigr)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{特解}
+
+特解的函数形式与激励函数的形式有关：
+
+\begin{table}[htbp]
+\centering
+\caption{特解 $y_p(k)$ 的形式}
+\small
+\begin{tabular}{@{}p{0.28\linewidth}p{0.42\linewidth}p{0.24\linewidth}@{}}
+\toprule
+激励 $f(k)$ & 特解 $y_p(k)$ & 条件 \\
+\midrule
+$k^{m}$ & $P_mk^{m}+P_{m-1}k^{m-1}+\cdots+P_1k+P_0$ & 所有特征根都不等于 $1$ \\
+$k^{m}$ & $k^{r}\bigl(P_mk^{m}+P_{m-1}k^{m-1}+\cdots+P_1k+P_0\bigr)$ & 有 $r$ 重等于 $1$ 的特征根 \\
+$a^{k}$ & $Pa^{k}$ & $a$ 不等于特征根 \\
+$a^{k}$ & $\bigl(P_rk^{r}+P_{r-1}k^{r-1}+\cdots+P_1k+P_0\bigr)a^{k}$ & $a$ 是 $r$ 重特征根 \\
+$\cos\beta k$ 或 $\sin\beta k$ & $P\cos\beta k+Q\sin\beta k$ & 所有特征根都不等于 $e^{j\beta}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{零输入响应与零状态响应}
+
+系统激励为零、仅由初始状态引起的响应称为零输入响应：
+\[
+    \sum_{j=0}^{n}a_{n-j}\,y_{zi}(k-j)=0 .
+\]
+若系统初始状态为零、仅由激励产生的响应，称为零状态响应：
+\[
+    \begin{cases}
+        \displaystyle\sum_{j=0}^{n}a_{n-j}\,y_{zs}(k-j)=\sum_{i=0}^{m}b_{m-i}\,f(k-i),\\[8pt]
+        y_{zs}(-1)=y_{zs}(-2)=\cdots=y_{zs}(-n)=0 .
+    \end{cases}
+\]
+
+\begin{note}
+系统的全响应可以分解为零输入响应与零状态响应，也可以分解为自由响应与强迫响应，
+但两者略有不同：零输入响应和自由响应都是齐次解，但系数不同。
+自由响应的系数由初始状态和激励共同决定，而零输入响应的系数仅由系统初始状态决定。
+\end{note}
+
+\section{单位序列和单位序列响应}
+
+单位序列定义为
+\[
+    \delta(k)=
+    \begin{cases}
+        1, & k=0,\\
+        0, & k\neq 0 .
+    \end{cases}
+\]
+单位阶跃序列定义为
+\[
+    \varepsilon(k)=
+    \begin{cases}
+        0, & k<0,\\
+        1, & k\ge 0 .
+    \end{cases}
+\]
+二者关系为 $\delta(k)=\varepsilon(k)-\varepsilon(k-1)$，
+$\varepsilon(k)=\sum_{i=0}^{\infty}\delta(k-i)$。
+
+\subsection{单位序列响应}
+
+单位序列响应用 $h(k)$ 表示。求解系统的单位序列响应可用解差分方程法以及 $z$ 变换法。
+对于方程右侧含 $f(k)$ 以及时移序列的情况，利用 LTI 系统零状态响应的线性性质与
+移位不变性，可以转换为方程右侧只含 $f(k)$ 的情形求解。
+
+\section{零状态响应与卷积和}
+
+\subsection{任意激励下的零状态响应}
+
+对 LTI 离散系统，把激励信号分解为单位序列：若系统的单位序列响应已知，
+则不难求出每个单位序列单独作用于系统的响应，将它们相加即得零状态响应，
+这一相加过程称为求\key{卷积和}。
+\[
+    f(k)=\sum_{i=-\infty}^{\infty}f(i)\,\delta(k-i),
+\]
+所以
+\begin{keyeq}
+    y_{zs}(k)=\sum_{i=-\infty}^{\infty}f(i)\,h(k-i)=f(k)*h(k).
+\end{keyeq}
+
+\subsection{卷积和}
+
+\begin{equation}
+    y(k)=f_1(k)*f_2(k)=\sum_{i=-\infty}^{\infty}f_1(i)\,f_2(k-i).
+\end{equation}
+对于因果序列（$k<0$ 时为零），求和下限可改为 $0$，上限为 $k$：
+\[
+    y(k)=\sum_{i=0}^{k}f_1(i)\,f_2(k-i).
+\]
+
+\subsection{卷积和的性质}
+
+\begin{itemize}
+    \item \key{交换律}：$f_1(k)*f_2(k)=f_2(k)*f_1(k)$；
+    \item \key{分配律}：$f_1(k)*\bigl[f_2(k)+f_3(k)\bigr]=f_1(k)*f_2(k)+f_1(k)*f_3(k)$；
+    \item \key{结合律}：$\bigl[f_1(k)*f_2(k)\bigr]*f_3(k)=f_1(k)*\bigl[f_2(k)*f_3(k)\bigr]$；
+    \item \key{时移}：若 $f_1(k)*f_2(k)=f(k)$，则
+          $f_1(k-k_1)*f_2(k-k_2)=f(k-k_1-k_2)$；
+    \item \key{与单位序列的卷积}：$f(k)*\delta(k)=f(k)$，
+          $f(k)*\delta(k-k_0)=f(k-k_0)$；
+    \item \key{求和}：$\displaystyle\sum_{i=-\infty}^{k}f(i)=f(k)*\varepsilon(k)$。
+\end{itemize}
+
+% ==================================================================
+\part{频域分析}
+
+\chapter{傅里叶变换与频域分析}
+\chaptertoc
+% ==================================================================
+
+\section{记号约定}
+
+\begin{table}[htbp]
+\centering
+\caption{本章记号}
+\begin{tabular}{@{}ll@{}}
+\toprule
+记号 & 含义 \\
+\midrule
+$T$ & 信号周期 \\
+$\Omega=\dfrac{2\pi}{T}$ & 基波角频率（周期信号） \\
+$n$ & 谐波次数，$n=0,1,2,\dots$ \\
+$\omega$ & 连续角频率（非周期信号） \\
+$\tau$ & 矩形脉冲宽度；也用作积分哑变量 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{正交函数与信号的正交分解}
+
+\subsection{正交函数集}
+
+\begin{definition*}
+若
+\[
+    \int_{t_1}^{t_2}\varphi_1(t)\,\varphi_2(t)\,\dd t=0,
+\]
+则称 $\varphi_1(t)$ 与 $\varphi_2(t)$ 在区间 $[t_1,t_2]$ 上\key{正交}。
+$n$ 个两两正交的函数构成\key{正交函数集} $\{\varphi_1,\varphi_2,\dots,\varphi_n\}$。
+\end{definition*}
+
+\key{完备性}\quad 若不存在 $\phi(t)\notin\{\varphi_i\}$ 使得对所有 $i$ 都有
+\[
+    \int_{t_1}^{t_2}\phi(t)\,\varphi_i(t)\,\dd t=0,
+\]
+则该函数集为\key{完备正交函数集}。
+
+\key{复函数集}\quad 正交条件改为内积取共轭：
+\[
+    \int_{t_1}^{t_2}\varphi_i(t)\,\varphi_j^{*}(t)\,\dd t=
+    \begin{cases}
+        0, & i\neq j,\\[2pt]
+        k_i\neq 0, & i=j .
+    \end{cases}
+\]
+
+\begin{note}
+\key{为什么可以这样类比}
+
+在线性运算下封闭的对象都可视为“向量”。连续函数可看作无穷维向量，
+自变量每一点的取值就是一个坐标：
+\[
+    f(x)=\lim_{\Delta x\to 0}\bigl(f(a),\,f(a+\Delta x),\,f(a+2\Delta x),\,\dots\bigr).
+\]
+两函数在 $[a,b]$ 上逐点相乘再求和（积分）即为内积，内积为零就是“垂直”，
+这正是正交的几何含义。
+\end{note}
+
+\subsection{信号分解为正交函数}
+
+用有限项近似：
+\[
+    f(t)\approx\sum_{j=1}^{n}c_j\varphi_j(t).
+\]
+以\key{均方误差}（原文称均方根误差）衡量逼近效果：
+\[
+    \overline{\epsilon^{2}}\ \overset{\mathrm{def}}{=}\
+    \frac{1}{t_2-t_1}\int_{t_1}^{t_2}
+    \Bigl[f(t)-\sum_{j=1}^{n}c_j\varphi_j(t)\Bigr]^{2}\dd t .
+\]
+误差取平方是为了消除正负抵消，使“偏差”不会因符号相反而互相抵消。
+
+\key{最佳系数}\quad 令 $\partial\overline{\epsilon^{2}}/\partial c_j=0$，
+利用正交性 $\int\varphi_i\varphi_j=0\ (i\neq j)$：
+\[
+    \frac{\partial}{\partial c_j}\int_{t_1}^{t_2}
+    \Bigl[f(t)-\sum_{i}c_i\varphi_i(t)\Bigr]^{2}\dd t
+    =\int_{t_1}^{t_2}\bigl[-2f(t)\varphi_j(t)+2c_j\varphi_j^{2}(t)\bigr]\dd t=0,
+\]
+故
+\[
+    \boxed{\;
+    c_j=\frac{\displaystyle\int_{t_1}^{t_2}f(t)\varphi_j(t)\,\dd t}
+             {\displaystyle\int_{t_1}^{t_2}\varphi_j^{2}(t)\,\dd t}
+       =\frac{1}{k_j}\int_{t_1}^{t_2}f(t)\varphi_j(t)\,\dd t\;}
+\]
+其中 $k_j=\displaystyle\int_{t_1}^{t_2}\varphi_j^{2}(t)\,\dd t$。
+
+\key{最小均方误差}\quad 代回后可得
+\[
+    \overline{\epsilon^{2}}=\frac{1}{t_2-t_1}
+    \left[\int_{t_1}^{t_2}f^{2}(t)\,\dd t-\sum_{j=1}^{n}c_j^{2}k_j\right].
+\]
+由于 $\overline{\epsilon^{2}}\ge 0$，项数越多误差越小；当 $n\to\infty$ 且函数集完备时
+$\overline{\epsilon^{2}}\to 0$，此时
+\[
+    \int_{t_1}^{t_2}f^{2}(t)\,\dd t=\sum_{j=1}^{\infty}c_j^{2}k_j,
+    \qquad
+    f(t)=\sum_{j=1}^{\infty}c_j\varphi_j(t).
+\]
+该能量等式称为\key{帕塞瓦尔方程}（Parseval）。
+
+\section{傅里叶级数}
+
+傅里叶级数就是帕塞瓦尔方程在正交基取三角函数时的特例。
+
+\subsection{三角形式}
+
+\begin{equation}
+    f(t)=\frac{a_0}{2}+\sum_{n=1}^{\infty}
+    \bigl[a_n\cos(n\Omega t)+b_n\sin(n\Omega t)\bigr].
+\end{equation}
+系数（由前一节的通用公式，取 $\varphi_j$ 为 $\cos n\Omega t$、$\sin n\Omega t$，$k=\frac{T}{2}$）：
+\[
+    a_n=\frac{2}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)\cos(n\Omega t)\,\dd t
+    \quad(n\ge 0),
+\]
+\[
+    b_n=\frac{2}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)\sin(n\Omega t)\,\dd t
+    \quad(n\ge 1).
+\]
+其中 $\dfrac{a_0}{2}=\dfrac{1}{T}\displaystyle\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)\,\dd t$
+即直流分量。
+
+\subsection{振幅—相位形式}
+
+由辅助角公式
+$a_n\cos\theta+b_n\sin\theta=\sqrt{a_n^{2}+b_n^{2}}\,\cos\bigl(\theta-\arctan\frac{b_n}{a_n}\bigr)$：
+\[
+    f(t)=\frac{A_0}{2}+\sum_{n=1}^{\infty}A_n\cos(n\Omega t+\varphi_n),
+\]
+\[
+    A_0=a_0,\qquad A_n=\sqrt{a_n^{2}+b_n^{2}},\qquad
+    \varphi_n=-\arctan\frac{b_n}{a_n}.
+\]
+$\omega=\Omega$ 的项为\key{基波}，$n\Omega$ 的项为\key{$n$ 次谐波}。
+
+\subsection{收敛性与吉布斯现象}
+
+谐波项越多，合成波形越接近原信号（间断点除外）。在间断点附近，
+尖峰随 $n$ 增大而向跳变点收缩，但\key{过冲幅度不随 $n$ 减小}，
+极限约为 $9\%$，称为\key{吉布斯现象}。
+
+\begin{note}
+\key{吉布斯过冲 $9\%$ 的推导}
+
+取方波
+\[
+    f(x)=
+    \begin{cases}
+        \ \ 1, & 0<x<\pi,\\
+        -1, & -\pi<x<0,
+    \end{cases}
+    \qquad
+    f(x)=\frac{4}{\pi}\sum_{k=0}^{\infty}\frac{\sin(2k+1)x}{2k+1}.
+\]
+有限项和为
+\[
+    S_N(x)=\frac{4}{\pi}\sum_{k=0}^{N}\frac{\sin(2k+1)x}{2k+1}
+    =\frac{4}{\pi}\int_0^{x}\sum_{k=0}^{N}\cos(2k+1)t\,\dd t .
+\]
+用核恒等式 $\displaystyle\sum_{k=0}^{N}\cos(2k+1)t=\frac{\sin(2N+2)t}{2\sin t}$，得
+\[
+    S_N(x)=\frac{4}{\pi}\int_0^{x}\frac{\sin(2N+2)t}{2\sin t}\,\dd t
+    =\frac{2}{\pi}\int_0^{(2N+2)x}
+    \frac{\sin u}{(2N+2)\sin\frac{u}{2N+2}}\,\dd u,
+\]
+其中作了代换 $u=(2N+2)t$、$\dd t=\dfrac{\dd u}{2N+2}$。
+
+令 $N\to\infty$，$(2N+2)\sin\frac{u}{2N+2}\to u$，于是
+\[
+    \lim_{N\to\infty}S_N(x)=\frac{2}{\pi}\int_0^{\infty}\frac{\sin u}{u}\,\dd u
+    \ \xrightarrow{\ X\to\infty\ }\
+    F(X)=\frac{2}{\pi}\int_0^{X}\frac{\sin u}{u}\,\dd u .
+\]
+$F'(X)=0$ 当 $X=n\pi$，第一个极值在 $X=\pi$：
+\[
+    F(\pi)=\frac{2}{\pi}\Si(\pi)=1.17898 .
+\]
+相对跳变幅度 $2$ 的过冲率
+\[
+    \delta=\frac{1.17898-1}{2}\approx 0.0895\approx 9\% .
+\]
+\end{note}
+
+\subsection{奇偶性与半波对称}
+
+\key{(1) $f(t)$ 为偶函数} $\Rightarrow b_n=0$，
+\[
+    a_n=\frac{4}{T}\int_0^{\frac{T}{2}}f(t)\cos(n\Omega t)\,\dd t,\qquad
+    A_n=|a_n|,\quad \varphi_n=m\pi .
+\]
+
+\key{(2) $f(t)$ 为奇函数} $\Rightarrow a_n=0$，
+\[
+    b_n=\frac{4}{T}\int_0^{\frac{T}{2}}f(t)\sin(n\Omega t)\,\dd t .
+\]
+
+\key{(3) 奇谐函数（半波对称）}\quad 若
+\[
+    f(t)=-f\!\left(t\pm\frac{T}{2}\right),
+\]
+则只含\key{奇次}谐波，不含偶次谐波。
+
+\subsection{指数形式}
+
+\begin{equation}
+    f(t)=\sum_{n=-\infty}^{\infty}F_n e^{jn\Omega t},
+    \qquad
+    F_n=\frac{1}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)e^{-jn\Omega t}\,\dd t .
+\end{equation}
+复系数可写作 $F_n=|F_n|e^{j\varphi_n}$。
+
+\begin{note}
+\key{推导要点}\quad 基函数 $e^{jn\Omega t}$ 的“自乘”积分为
+$\int_{-T/2}^{T/2}e^{jn\Omega t}\bigl(e^{jn\Omega t}\bigr)^{*}\dd t=T$，
+不同 $n$ 之间为 $0$，故 $k=T$，直接套用前一节的通用公式即得。
+\end{note}
+\begin{note}
+\key{补} 复指数信号为什么能描述LTI系统,实际是因为其响应也为复指数信号,即复指数信号是LTI系统的本征函数,特征值由系统的冲激响应决定。所以若输入可以拆分为复指数信号的线性组合,则输出也可以拆分为复指数信号的线性组合,即输出可以由输入的复指数信号的特征值决定。
+\end{note}
+\subsection{两种形式的关系}
+
+由欧拉公式
+\[
+    \cos x=\frac{e^{jx}+e^{-jx}}{2},
+\]
+\[
+\begin{aligned}
+    f(t)&=\frac{A_0}{2}+\sum_{n=1}^{\infty}\frac{A_n}{2}
+          \Bigl[e^{j(n\Omega t+\varphi_n)}+e^{-j(n\Omega t+\varphi_n)}\Bigr]\\
+        &=\frac{1}{2}\sum_{n=-\infty}^{\infty}A_n e^{j\varphi_n}e^{jn\Omega t}.
+\end{aligned}
+\]
+因此
+\[
+    F_n=\frac{1}{2}A_n e^{j\varphi_n},\qquad |F_n|=\frac{1}{2}A_n .
+\]
+即：\key{双边谱的幅度是单边谱的一半}，双边谱的负频率项与正频率项共同合成单边的物理分量。
+
+\section{周期信号的频谱}
+
+由 $f(t)=\dfrac{A_0}{2}+\sum A_n\cos(n\Omega t+\varphi_n)$ 或
+$f(t)=\sum F_ne^{jn\Omega t}$ 可见：只要给定 $\Omega$、各次谐波的幅值与初相，
+周期信号就完全确定。以 $n\Omega$（或 $n$）为横轴、幅值或相位为纵轴作图，即得\key{频谱}。
+
+\begin{table}[htbp]
+\centering
+\caption{两种频谱形式}
+\begin{tabular}{@{}lll@{}}
+\toprule
+形式 & $n$ 的取值范围 & 名称 \\
+\midrule
+三角形式 $A_n,\varphi_n$ & $n\in[1,+\infty)$ & 单边谱 \\
+指数形式 $F_n$ & $n\in(-\infty,+\infty)$ & 双边谱 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+对\key{实信号}：双边幅度谱为偶对称，双边相位谱为奇对称（复信号不成立）。
+
+\subsection{周期矩形脉冲的频谱}
+
+\begin{keyeq}
+\begin{aligned}
+    F_n&=\frac{1}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)e^{-jn\Omega t}\,\dd t
+        =\frac{1}{T}\int_{-\frac{\tau}{2}}^{\frac{\tau}{2}}e^{-jn\Omega t}\,\dd t\\
+       &=\frac{2}{T}\cdot\frac{\sin\left(\dfrac{n\Omega\tau}{2}\right)}{n\Omega}
+        =\frac{\tau}{T}\cdot
+         \frac{\sin\left(\dfrac{n\Omega\tau}{2}\right)}{\dfrac{n\Omega\tau}{2}}
+        =\frac{\tau}{T}\,\Sa\!\left(\frac{n\Omega\tau}{2}\right).
+\end{aligned}
+\end{keyeq}
+其中 $\Sa(x)=\dfrac{\sin x}{x}$ 为抽样函数。
+
+\begin{itemize}
+    \item 频谱\key{离散}，谱线间隔为 $\Omega=\dfrac{2\pi}{T}$，故 $T$ 越大间隔越小；
+    \item 包络由 $\Sa$ 决定，零点位于 $\dfrac{n\Omega\tau}{2}=k\pi$，即 $f=\dfrac{k}{\tau}$；
+    \item 信号能量主要集中在第一个零点以内，定义\key{带宽}
+    \[
+        0\le f\le\frac{1}{\tau},\qquad \Delta F=\frac{1}{\tau}.
+    \]
+\end{itemize}
+
+当 $T\to\infty$ 时，谱线间隔趋于零，离散谱过渡为连续谱——这正是傅里叶变换的由来。
+
+\begin{figure}[htbp]
+\centering
+\caption{周期矩形脉冲的频谱（谱线为离散谱，包络为 $\Sa$ 函数）}
+\end{figure}
+
+\section{周期信号的功率与帕塞瓦尔恒等式}
+
+平均功率
+\[
+    P=\frac{1}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f^{2}(t)\,\dd t .
+\]
+代入三角级数并利用三角函数系的正交性：
+\[
+    P=\frac{A_0^{2}}{4}+\sum_{n=1}^{\infty}\frac{A_n^{2}}{2}
+     =P_{\text{直流}}+P_{\text{交流}} .
+\]
+由于 $|F_n|=\frac{1}{2}A_n$，得到
+\begin{keyeq}
+    \boxed{\;P=\sum_{n=-\infty}^{\infty}|F_n|^{2}\;}
+\end{keyeq}
+即\key{帕塞瓦尔恒等式}：时域平均功率等于频域各谱线功率之和。
+
+\section{傅里叶变换}
+
+\subsection{从级数到变换}
+
+周期信号 $f_T(t)=\sum F_ne^{jn\Omega t}$，其中
+$F_n=\frac{1}{T}\int_{-T/2}^{T/2}f_T(t)e^{-jn\Omega t}\dd t$。令 $T\to\infty$：
+
+\begin{itemize}
+    \item 谱线间隔 $\Omega\to\dd\omega$，离散求和变为积分；
+    \item 幅度趋于无穷小，故引入\key{频谱密度} $F(j\omega)$ 替代 $F_n$。
+\end{itemize}
+
+\[
+    f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}
+    \left[\int_{-\infty}^{\infty}f(\tau)e^{-j\omega\tau}\,\dd\tau\right]
+    e^{j\omega t}\,\dd\omega .
+\]
+由此定义
+\begin{keyeq}
+    \boxed{\;F(j\omega)=\int_{-\infty}^{\infty}f(t)e^{-j\omega t}\,\dd t\;}
+    \qquad\text{（傅里叶变换）}
+\end{keyeq}
+\begin{keyeq}
+    \boxed{\;f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)e^{j\omega t}\,\dd\omega\;}
+    \qquad\text{（傅里叶逆变换）}
+\end{keyeq}
+记作 $\mathcal{F}[f(t)]=F(j\omega)$，$\mathcal{F}^{-1}[F(j\omega)]=f(t)$。
+$F(j\omega)$ 称为\key{频谱密度函数}。
+
+\subsection{复频谱的两种写法}
+
+\[
+    F(j\omega)=|F(j\omega)|e^{j\varphi(\omega)}=R(\omega)+jX(\omega).
+\]
+由逆变换可把实部、虚部对应到余弦、正弦分量（利用 $|F|$ 为偶函数、$\varphi$ 为奇函数）：
+\[
+    f(t)=\frac{1}{\pi}\int_0^{\infty}|F(j\omega)|\cos\bigl(\omega t+\varphi(\omega)\bigr)\,\dd\omega .
+\]
+即：非周期实信号可看作无穷多个振幅为
+$\dfrac{|F(j\omega)|\dd\omega}{\pi}$ 的余弦分量连续叠加。
+
+\subsection{信号的奇偶性与频谱的对称性}
+
+把 $e^{-j\omega t}=\cos\omega t-j\sin\omega t$ 代入定义：
+\[
+    F(j\omega)=\underbrace{\int_{-\infty}^{\infty}f(t)\cos\omega t\,\dd t}_{R(\omega)}
+    -j\underbrace{\int_{-\infty}^{\infty}f(t)\sin\omega t\,\dd t}_{-X(\omega)},
+\]
+\[
+    R(\omega)=\int_{-\infty}^{\infty}f(t)\cos\omega t\,\dd t
+    \quad(\omega\text{ 的偶函数}),
+\]
+\[
+    X(\omega)=-\int_{-\infty}^{\infty}f(t)\sin\omega t\,\dd t
+    \quad(\omega\text{ 的奇函数}).
+\]
+因此
+\[
+    |F(-j\omega)|=|F(j\omega)|\ \ (\text{偶}),\qquad
+    \varphi(-\omega)=-\varphi(\omega)\ \ (\text{奇}),
+\]
+\[
+    \boxed{\;F(-j\omega)=F^{*}(j\omega)\;}\qquad(\text{实信号，共轭对称}).
+\]
+幅角为
+\[
+    \varphi(\omega)=\arctan\frac{X(\omega)}{R(\omega)} .
+\]
+
+\begin{table}[htbp]
+\centering
+\caption{实信号频谱的特例}
+\small
+\begin{tabular}{@{}p{0.20\linewidth}p{0.74\linewidth}@{}}
+\toprule
+$f(t)$ & 结论 \\
+\midrule
+实\key{偶}函数 & $X(\omega)=0$，
+$F(j\omega)=R(\omega)=2\displaystyle\int_0^{\infty}f(t)\cos\omega t\,\dd t$，且为实偶函数 \\
+实\key{奇}函数 & $R(\omega)=0$，
+$F(j\omega)=jX(\omega)=-2j\displaystyle\int_0^{\infty}f(t)\sin\omega t\,\dd t$，为纯虚奇函数 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\key{时间反转}\quad 令 $\tau=-t$，则
+\[
+    \mathcal{F}[f(-t)]=\int_{-\infty}^{\infty}f(-t)e^{-j\omega t}\,\dd t
+    =\int_{-\infty}^{\infty}f(\tau)e^{j\omega\tau}\,\dd\tau
+    =F(-j\omega)=F^{*}(j\omega).
+\]
+
+\section{奇异函数的傅里叶变换}
+
+\begin{note}
+\key{说明}\quad 下列信号不满足绝对可积条件（Dirichlet 条件之一），
+严格意义上是取极限或在广义函数意义下的变换结果。
+\end{note}
+
+\key{(1) 单位冲激} $\delta(t)$
+\[
+    \mathcal{F}[\delta(t)]=\int_{-\infty}^{\infty}\delta(t)e^{-j\omega t}\,\dd t
+    =e^{0}=1 .
+\]
+时域最集中 $\Rightarrow$ 频域最均匀（常数谱）。
+
+\key{(2) 冲激的导数}\quad 利用
+$\displaystyle\int\delta^{(n)}(t)\varphi(t)\dd t=(-1)^{n}\varphi^{(n)}(0)$：
+\[
+    \mathcal{F}[\delta^{(n)}(t)]
+    =\int_{-\infty}^{\infty}\delta^{(n)}(t)e^{-j\omega t}\,\dd t
+    =(-1)^{n}\left.\frac{\dd^{n}}{\dd t^{n}}e^{-j\omega t}\right|_{t=0}
+    =(j\omega)^{n}.
+\]
+
+\key{(3) 单位直流} $f(t)=1$
+
+取 $f_1(t)=e^{-\alpha|t|}\xrightarrow{\alpha\to0}1$，而
+\[
+    F_1(j\omega)=\frac{2\alpha}{\alpha^{2}+\omega^{2}}
+    \ \xrightarrow{\alpha\to0}\
+    \begin{cases}
+        \infty, & \omega=0,\\
+        0, & \omega\neq 0,
+    \end{cases}
+\]
+且总强度
+\[
+    \lim_{\alpha\to0}\int_{-\infty}^{\infty}\frac{2\alpha}{\alpha^{2}+\omega^{2}}\,\dd\omega
+    =2\arctan\frac{\omega}{\alpha}\Big|_{-\infty}^{+\infty}=2\pi .
+\]
+因此
+\[
+    \mathcal{F}[1]=2\pi\delta(\omega).
+\]
+
+\key{(4) 符号函数} $\sgn(t)$
+
+取 $f_2(t)=\sgn(t)e^{-\alpha|t|}$，得
+$F_2(j\omega)=\dfrac{-2j\omega}{\alpha^{2}+\omega^{2}}$，令 $\alpha\to0$：
+\[
+    \mathcal{F}[\sgn(t)]=\frac{2}{j\omega}\qquad(\omega\neq 0).
+\]
+
+\key{(5) 单位阶跃}\quad
+$\varepsilon(t)=\dfrac{1}{2}+\dfrac{1}{2}\sgn(t)$
+\[
+    \mathcal{F}[\varepsilon(t)]=\pi\delta(\omega)+\frac{1}{j\omega}
+    =\pi\delta(\omega)-j\frac{1}{\omega}.
+\]
+
+\section{傅里叶变换的性质}
+
+\begin{table}[htbp]
+\centering
+\caption{傅里叶变换的主要性质（$f(t)\lrarr F(j\omega)$）}
+\small
+\begin{tabular}{@{}p{0.26\linewidth}p{0.34\linewidth}p{0.34\linewidth}@{}}
+\toprule
+性质 & 时域 & 频域 \\
+\midrule
+线性 & $af_1(t)+bf_2(t)$ & $aF_1(j\omega)+bF_2(j\omega)$ \\
+对称性 & $F(jt)$ & $2\pi f(-\omega)$ \\
+尺度变换 & $f(at)$ & $\dfrac{1}{|a|}F\!\left(j\dfrac{\omega}{a}\right)$ \\
+时移 & $f(t\pm t_0)$ & $e^{\pm j\omega t_0}F(j\omega)$ \\
+频移 & $f(t)e^{\pm j\omega_0 t}$ & $F\bigl(j(\omega\mp\omega_0)\bigr)$ \\
+时域卷积 & $f_1(t)*f_2(t)$ & $F_1(j\omega)F_2(j\omega)$ \\
+频域卷积 & $f_1(t)f_2(t)$ & $\dfrac{1}{2\pi}F_1(j\omega)*F_2(j\omega)$ \\
+时域微分 & $f^{(n)}(t)$ & $(j\omega)^{n}F(j\omega)$ \\
+时域积分 & $f^{(-1)}(t)=\displaystyle\int_{-\infty}^{t}f(x)\dd x$
+         & $\pi F(0)\delta(\omega)+\dfrac{F(j\omega)}{j\omega}$ \\
+频域微分 & $(-jt)^{n}f(t)$ & $F^{(n)}(j\omega)$ \\
+频域积分 & $\pi f(0)\delta(t)+\dfrac{f(t)}{-jt}$ & $F^{(-1)}(j\omega)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{线性}
+
+若
+\[
+    f_1(t)\lrarr F_1(j\omega),\qquad f_2(t)\lrarr F_2(j\omega),
+\]
+则
+\[
+    af_1(t)+bf_2(t)\lrarr aF_1(j\omega)+bF_2(j\omega).
+\]
+
+\subsection{对称性}
+
+若 $f(t)\lrarr F(j\omega)$，则
+\[
+    F(jt)\lrarr 2\pi f(-\omega).
+\]
+
+\begin{note}
+\point{证明}\quad 由逆变换
+\[
+    f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)e^{j\omega t}\,\dd\omega,
+\]
+\[
+    f(-t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)e^{-j\omega t}\,\dd\omega .
+\]
+交换变量名 $t\leftrightarrow\omega$，得
+\[
+    f(-\omega)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(jt)e^{-j\omega t}\,\dd t
+    =\frac{1}{2\pi}\mathcal{F}[F(jt)],
+\]
+所以 $F(jt)\lrarr 2\pi f(-\omega)$。
+\end{note}
+
+\subsection{尺度变换}
+
+\[
+    f(at)\lrarr \frac{1}{|a|}F\!\left(j\frac{\omega}{a}\right).
+\]
+
+\begin{note}
+\point{证明}\quad
+$\mathcal{F}[f(at)]=\displaystyle\int_{-\infty}^{\infty}f(at)e^{-j\omega t}\,\dd t$。
+设 $a>0$，令 $at=x$，则
+\[
+    \mathcal{F}[f(at)]=\frac{1}{a}\int_{-\infty}^{\infty}f(x)e^{-j\omega\frac{x}{a}}\,\dd x
+    =\frac{1}{a}F\!\left(j\frac{\omega}{a}\right).
+\]
+当 $a<0$ 时积分限反转、多出一个负号，与 $|a|$ 合并即得通式。
+\end{note}
+
+信号的持续时间与信号的占有频带成反比。
+
+\subsection{时移特性}
+
+若 $f(t)\lrarr F(j\omega)$，$t_0$ 为常数，则
+\[
+    f(t\pm t_0)\lrarr e^{\pm j\omega t_0}F(j\omega).
+\]
+
+\begin{note}
+\point{证明}\quad 令 $x=t\pm t_0$：
+\[
+    \int_{-\infty}^{\infty}f(t\pm t_0)e^{-j\omega t}\,\dd t
+    =\int_{-\infty}^{\infty}f(x)e^{-j\omega(x\mp t_0)}\,\dd x
+    =e^{\pm j\omega t_0}F(j\omega).
+\]
+\end{note}
+
+\subsection{频移特性}
+
+若 $f(t)\lrarr F(j\omega)$，则
+\[
+    f(t)e^{\pm j\omega_0 t}\lrarr F\bigl(j(\omega\mp\omega_0)\bigr).
+\]
+这正是调制（搬移频谱）的理论依据。
+
+\subsection{卷积定理}
+
+\key{时域卷积定理}\quad 若
+$f_1(t)\lrarr F_1(j\omega)$，$f_2(t)\lrarr F_2(j\omega)$，则
+\begin{keyeq}
+    \mathcal{F}[f_1(t)*f_2(t)]=F_1(j\omega)F_2(j\omega).
+\end{keyeq}
+
+\begin{note}
+\point{证明}\quad
+\[
+\begin{aligned}
+    \mathcal{F}[f_1(t)*f_2(t)]
+    &=\int_{-\infty}^{\infty}\left[\int_{-\infty}^{\infty}f_1(\tau)f_2(t-\tau)\,\dd\tau\right]
+      e^{-j\omega t}\,\dd t\\
+    &=\int_{-\infty}^{\infty}f_1(\tau)
+      \left[\int_{-\infty}^{\infty}f_2(t-\tau)e^{-j\omega t}\,\dd t\right]\dd\tau\\
+    &=\int_{-\infty}^{\infty}f_1(\tau)e^{-j\omega\tau}F_2(j\omega)\,\dd\tau
+      =F_1(j\omega)F_2(j\omega).
+\end{aligned}
+\]
+\end{note}
+
+\key{频域卷积定理}\quad 若
+$f_1(t)\lrarr F_1(j\omega)$，$f_2(t)\lrarr F_2(j\omega)$，则
+\[
+    f_1(t)f_2(t)\lrarr\frac{1}{2\pi}F_1(j\omega)*F_2(j\omega).
+\]
+证明类似：利用定义式，交换积分顺序并应用频移特性即可。
+
+\subsection{时域微分和积分}
+
+定义
+\[
+    f^{(n)}(t)=\frac{\dd^{n}f(t)}{\dd t^{n}},\qquad
+    f^{(-1)}(t)=\int_{-\infty}^{t}f(x)\,\dd x .
+\]
+若 $f(t)\lrarr F(j\omega)$，则
+\[
+    f^{(n)}(t)\lrarr(j\omega)^{n}F(j\omega),
+\]
+\[
+    f^{(-1)}(t)\lrarr\pi F(0)\delta(\omega)+\frac{F(j\omega)}{j\omega},
+\]
+其中
+\[
+    F(0)=\int_{-\infty}^{\infty}f(t)\,\dd t .
+\]
+
+\begin{note}
+有时 $f(t)=g'(t)$，但 $g(t)\neq f^{(-1)}(t)=\displaystyle\int_{-\infty}^{t}f(x)\dd x$。
+两者是否相等取决于 $g(-\infty)$ 是否为零：只有 $g(-\infty)=0$ 时，
+$g(t)$ 才等于 $f(t)$ 的积分，否则会差一个常数（在频域上表现为 $\pi F(0)\delta(\omega)$ 项）。
+\end{note}
+
+\subsection{频域微分和积分}
+
+若 $f(t)\lrarr F(j\omega)$，则
+\[
+    (-jt)^{n}f(t)\lrarr F^{(n)}(j\omega),
+\]
+\[
+    \pi f(0)\delta(t)+\frac{f(t)}{-jt}\lrarr F^{(-1)}(j\omega),
+\]
+其中
+\[
+    f(0)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)\,\dd\omega .
+\]
+
+\section{周期信号的傅里叶变换}
+
+周期信号
+\[
+    f_T(t)=\sum_{n=-\infty}^{\infty}F_ne^{jn\Omega t},
+    \qquad
+    F_n=\frac{1}{T}\int_{-\frac{T}{2}}^{\frac{T}{2}}f(t)e^{-jn\Omega t}\,\dd t,
+\]
+所以
+\[
+    \mathcal{F}[f_T(t)]=2\pi\sum_{n=-\infty}^{\infty}F_n\,\delta(\omega-n\Omega),
+\]
+即周期信号的频谱是一串等间隔的冲激，冲激强度为 $2\pi F_n$。
+
+\subsection{傅里叶系数与傅里叶变换的关系}
+
+单个脉冲 $f_0(t)$ 以 $T$ 为周期延拓，可写成周期冲激串的卷积：
+\[
+    f_T(t)=f_0(t)*\delta_T(t),
+    \qquad
+    \delta_T(t)=\sum_{n=-\infty}^{\infty}\delta(t-nT).
+\]
+由时域卷积定理及 $\mathcal{F}[\delta_T(t)]=\Omega\displaystyle\sum_{n=-\infty}^{\infty}\delta(\omega-n\Omega)$，
+$\Omega=\dfrac{2\pi}{T}$：
+\[
+    \mathcal{F}[f_T(t)]
+    =F_0(j\omega)\,\Omega\,\delta_{\Omega}(\omega)
+    =\Omega\sum_{n=-\infty}^{\infty}F_0(jn\Omega)\,\delta(\omega-n\Omega).
+\]
+与上式的冲激强度 $2\pi F_n=\Omega T F_n$ 比较，得
+\[
+    F_n=\frac{1}{T}F_0(jn\Omega),
+\]
+即\key{周期信号的傅里叶系数等于单个脉冲频谱在 $n\Omega$ 处的采样值除以 $T$}。
+
+\section{LTI 系统的频域分析}
+
+\subsection{频率响应}
+
+傅里叶变换把信号拆分为无数不同频率的虚指数函数之和，先研究虚指数函数作用于系统的响应。
+由 $y(t)=h(t)*f(t)$，
+\[
+    y(t)=\int_{-\infty}^{\infty}h(\tau)f(t-\tau)\,\dd\tau
+    =\int_{-\infty}^{\infty}h(\tau)e^{-j\omega\tau}\,\dd\tau\;e^{j\omega t}
+    =H(j\omega)e^{j\omega t}.
+\]
+所以虚指数函数的零状态响应仍是同频率的虚指数函数，只是乘上了系数 $H(j\omega)$。
+又因为
+\[
+    f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(j\omega)e^{j\omega t}\,\dd\omega,
+\]
+每一个 $\omega$ 的分量为 $\dfrac{F(j\omega)\dd\omega}{2\pi}e^{j\omega t}$，根据线性性质
+\[
+    y(t)=\int_{-\infty}^{\infty}H(j\omega)\frac{F(j\omega)\,\dd\omega}{2\pi}e^{j\omega t}
+    =\frac{1}{2\pi}\int_{-\infty}^{\infty}H(j\omega)F(j\omega)e^{j\omega t}\,\dd\omega .
+\]
+所以
+\begin{keyeq}
+    Y(j\omega)=H(j\omega)F(j\omega),
+\end{keyeq}
+这实际上就是\key{时域卷积定理}。$H(j\omega)$ 称为\key{频率响应}（系统函数）：
+\begin{keyeq}
+    H(j\omega)=\frac{Y(j\omega)}{F(j\omega)} .
+\end{keyeq}
+
+\subsection{频域分析}
+
+时域中信号的卷积对应频域中其对应频谱的乘积。
+
+\begin{note}
+\point{例}\quad 描述某系统的微分方程为
+\[
+    y'(t)+2y(t)=f(t),
+\]
+求输入 $f(t)=e^{-t}\varepsilon(t)$ 时系统的响应。
+
+\point{解}\quad 先将时域方程变换到频域：
+\[
+    j\omega Y(j\omega)+2Y(j\omega)=F(j\omega),
+\]
+得系统频率响应
+\[
+    H(j\omega)=\frac{Y(j\omega)}{F(j\omega)}=\frac{1}{j\omega+2}.
+\]
+而
+\[
+    F(j\omega)=\frac{1}{j\omega+1},
+\]
+所以
+\[
+    Y(j\omega)=\frac{1}{(j\omega+2)(j\omega+1)}
+    =\frac{1}{j\omega+1}-\frac{1}{j\omega+2},
+\]
+反变换得
+\[
+    y(t)=\bigl(e^{-t}-e^{-2t}\bigr)\varepsilon(t).
+\]
+\end{note}
+
+\subsection{无失真传输}
+
+无失真传输指系统输出信号与输入信号相比，只有幅度和出现时间发生变化，波形不发生畸变。
+设输入为 $f(t)$，则
+\[
+    y(t)=Kf(t-t_0),
+    \qquad
+    Y(j\omega)=Ke^{-j\omega t_0}F(j\omega),
+\]
+所以系统的频率响应应为
+\[
+    H(j\omega)=Ke^{-j\omega t_0},
+\]
+其冲激响应为
+\[
+    h(t)=K\delta(t-t_0).
+\]
+即：\key{幅频特性为常数、相频特性为过原点的直线}，是系统无失真传输的充要条件。
+
+\subsection{理想低通滤波器的响应}
+
+理想低通滤波器把角频率低于 $\omega_c$ 的信号无失真传输，高于 $\omega_c$ 的信号被阻塞。
+能通过的频率范围称为通带，被阻止的频带称为阻带。
+
+设截止角频率为 $\omega_c$，通带内幅频特性 $|H(j\omega)|=1$，
+相频特性 $\varphi(\omega)=-\omega t_0$，则
+\[
+    H(j\omega)=
+    \begin{cases}
+        e^{-j\omega t_0}, & |\omega|<\omega_c,\\
+        0, & |\omega|>\omega_c,
+    \end{cases}
+\]
+可以看作宽度为 $2\omega_c$ 的门函数
+\[
+    H(j\omega)=e^{-j\omega t_0}g_{2\omega_c}(\omega).
+\]
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=7.2cm, height=4.2cm,
+    xmin=-4.2, xmax=4.2, ymin=0, ymax=1.35,
+    xlabel={$\omega$}, ylabel={$|H(j\omega)|$},
+    axis lines=middle,
+    xtick={-3,0,3}, xticklabels={$-\omega_c$,$0$,$\omega_c$},
+    ytick={0,1},
+    title={幅频特性},
+    title style={font=\small},
+]
+    \addplot[blue, very thick, const plot]
+        coordinates {(-4.2,0) (-3,0) (-3,1) (3,1) (3,0) (4.2,0)};
+\end{axis}
+\end{tikzpicture}
+\hspace{6mm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=7.2cm, height=4.2cm,
+    xmin=-4.2, xmax=4.2, ymin=-0.9, ymax=0.9,
+    xlabel={$\omega$}, ylabel={$\varphi(\omega)$},
+    axis lines=middle,
+    xtick={-3,0,3}, xticklabels={$-\omega_c$,$0$,$\omega_c$},
+    ytick={-0.6,0,0.6},
+    title={相频特性（通带内）},
+    title style={font=\small},
+]
+    \addplot[red, very thick, domain=-3:3] {-0.25*x};
+\end{axis}
+\end{tikzpicture}
+\caption{理想低通滤波器的频率特性}
+\end{figure}
+
+\subsubsection{冲激响应}
+
+\[
+    h(t)=\mathcal{F}^{-1}\bigl[e^{-j\omega t_0}g_{2\omega_c}(\omega)\bigr].
+\]
+由对称性：$g_\tau(t)\lrarr\tau\Sa\!\left(\dfrac{\tau}{2}\omega\right)$，
+故 $\tau\Sa\!\left(\dfrac{\tau}{2}t\right)\lrarr 2\pi g_\tau(-\omega)=2\pi g_\tau(\omega)$。
+取 $\tau=2\omega_c$ 并计入时移因子，得
+\begin{keyeq}
+    h(t)=\frac{\omega_c}{\pi}\,\Sa\bigl[\omega_c(t-t_0)\bigr].
+\end{keyeq}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=11cm, height=5cm,
+    xmin=-4, xmax=4, ymin=-0.45, ymax=1.25,
+    xlabel={$t$}, ylabel={$h(t)$},
+    axis lines=middle,
+    xtick={-3,-2,-1,0,1,2,3},
+    ytick={0,0.5,1},
+    samples=200,
+    legend pos=north east,
+]
+    \addplot[blue, thick, domain=-4:-0.02] {sin(deg(3*x))/(3*x)};
+    \addplot[blue, thick, domain=0.02:4]  {sin(deg(3*x))/(3*x)};
+    \addlegendentry{$h(t)=\dfrac{\omega_c}{\pi}\Sa(\omega_c t)$}
+\end{axis}
+\end{tikzpicture}
+\caption{理想低通滤波器的冲激响应（$\omega_c=3$，$t_0=0$）}
+\end{figure}
+
+\subsubsection{阶跃响应}
+
+设理想低通滤波器的阶跃响应为 $g(t)$，它等于 $h(t)$ 与单位阶跃函数的卷积积分：
+\[
+    g(t)=h(t)*\varepsilon(t)=\int_{-\infty}^{t}h(\tau)\,\dd\tau
+    =\int_{-\infty}^{t}\frac{\omega_c}{\pi}\Sa\bigl[\omega_c(\tau-t_0)\bigr]\dd\tau,
+\]
+\[
+    g(t)=\int_{-\infty}^{t}\frac{\omega_c}{\pi}
+    \frac{\sin\bigl[\omega_c(\tau-t_0)\bigr]}{\omega_c(\tau-t_0)}\,\dd\tau
+    =\frac{1}{2}+\frac{1}{\pi}\Si\bigl[\omega_c(t-t_0)\bigr],
+\]
+其中
+\[
+    \Si(x)=\int_0^{x}\frac{\sin\eta}{\eta}\,\dd\eta .
+\]
+可见阶跃响应在 $t=t_0$ 前后就已经开始建立、之后仍有振荡，
+这说明理想低通滤波器是\key{非因果}的，物理上不可实现，只能近似逼近。\par
+就频域特性来说,佩利和纳维证明物理可实现的系统的幅频特性|H(j\omega)|要是平方可积,即
+\[
+    \int_{-\infty}^{\infty}|H(j\omega)|^2\,\dd\omega<\infty.
+\]
+而且满足
+\[
+\int_{-\infty}^{\infty}\frac{{|ln|H(j\omega)|}}{1+|\omega|^2}\,\dd\omega<\infty.
+\]\par
+\qquad   这个条件称为佩利-纳维条件,它是物理可实现的系统的必要条件。
+\section{取样定理}
+\qquad 取样定理描述了在一定条件下,连续时间信号可以通过离散时间信号来表示,即连续时间信号可以通过离散时间信号来恢复。
+\subsection{信号的取样}
+我们用取样脉冲序列s(t)与连续时间信号f(t)相乘,得到取样信号$f_s(t)$,即
+\[
+f_s(t)=f(t)s(t)
+\]
+s(t)也叫开关函数。在这种采样脉冲间隔相同的情况下,称为等间隔取样,取样间隔为T,取样频率为$f_s=\frac{1}{T_s}$。\par
+如果$f(t)\leftrightarrow F(j\omega)$,$s(t)\leftrightarrow S(j\omega)$。满足 
+\[
+F_s(j\omega)=\frac{1}{2\pi}F(j\omega)*S(j\omega)
+\]
+\subsubsection{冲激采样}
+\qquad 如果采样脉冲序列为冲激序列，周期为$T_s$,记作$\delta_{T_s}(t)$.根据时移特性可知,冲激序列的频谱函数还是冲激序列
+\[
+\mathcal{F}[{s(t)}]=\mathcal{F}[{\delta_{T_s}(t)}]=\mathcal{F}[\sum_{n=-\infty}^{\infty}[\delta(t-nT_s)]=\omega_s\sum_{n=-\infty}^{\infty}[\delta(\omega-n\omega_s)]
+\]
+\qquad 如果频带是有限的,这样的信号称为频带有限信号,简称为带限信号。设$f(t)$是带限信号.
+\[
+F_s(j\omega)=\frac{1}{T_s}\sum_{m=-\infty}^{\infty}F(j(\omega-m\omega_s))
+\]
+\par
+我们计算发现取样信号的频谱由原信号频谱$F(j\omega)$的无限个频移项组成,频移的角频率为m$\omega_s$,幅值为原频谱的$\frac{1}{T_s}$.\par
+ 如果$w_s>2\omega_m$,则频谱后的频谱不发生重叠.这样就能从取样信号中恢复原信号,这就是取样定理的基本思想.\\
+\subsubsection{矩形采样}
+\qquad 如果采样序列是幅值为1,周期为$\tau$的矩形脉冲序列$p_{T_s}(t)$。则s(t)的频谱为
+\[
+    S(j\omega)=P(j\omega)=\mathcal{P_{T_s}(t)}=\frac{2\pi\tau}{T_s}\sum_{n=-\infty}^{\infty}Sa(\frac{n\omega\tau}{2})\delta(\omega-n\omega_s)
+\]
+所以
+\[
+    F_s(j\omega)=\frac{1}{2\pi}F(j\omega)*S(j\omega)=\frac{1}{2\pi}F(j\omega)*P(j\omega)
+    =\frac{\tau}{T_s}\sum_{n=-\infty}^{\infty}F(j(\omega-n\omega_s))Sa(\frac{n\omega\tau}{2})
+\]
+同理,当$\omega>2\omega_m$时取样信号的频谱不会发生混叠,可以从取样信号中恢复原信号。
+ \end{document}
